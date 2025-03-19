@@ -9,12 +9,19 @@
   },
   "exports": {
     "./commitizen": {
-      "require": "./lib/commitizen/index.cjs",
-      "default": "./lib/commitizen/index.cjs"
+      "require": "./lib/commitizen/index.mjs",
+      "import": "./lib/commitizen/index.mjs",
+      "default": "./lib/commitizen/index.mjs"
     },
     "./commitlint": {
-      "require": "./lib/commitlint/index.cjs",
-      "default": "./lib/commitlint/index.cjs"
+      "require": "./lib/commitlint/index.mjs",
+      "import": "./lib/commitlint/index.mjs",
+      "default": "./lib/commitlint/index.mjs"
+    },
+    "./semantic-release": {
+      "require": "./lib/semantic-release/index.mjs",
+      "import": "./lib/semantic-release/index.mjs",
+      "default": "./lib/semantic-release/index.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -43,7 +50,8 @@
     "@semantic-release/git": "^10",
     "@semantic-release/npm": "^12",
     "@semantic-release/release-notes-generator": "^14",
-    "commitizen": "^4"
+    "commitizen": "^4",
+    "semantic-release": "^24"
   },
   "dependencies": {
     "chokidar": "^4.0.3",
@@ -58,16 +66,15 @@
     "@types/inquirer": "^8.2.10",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
-    "eslint-import-resolver-typescript": "^4.2.1",
+    "eslint-import-resolver-typescript": "^4.2.2",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-unused-imports": "^4.1.4",
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "rollup": "^4.36.0",
-    "rollup-plugin-dts": "^6.1.1",
+    "rollup-plugin-dts": "^6.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
-    "semantic-release": "^24.2.3",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1"
   }

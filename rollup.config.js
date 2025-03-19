@@ -1,6 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-swc';
+import terser from '@rollup/plugin-terser';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
 function build({ folder = '' } = {}) {
@@ -9,12 +10,6 @@ function build({ folder = '' } = {}) {
     {
       input: `src/${_folder}index.ts`,
       output: [
-        {
-          file: `lib/${_folder}index.cjs`,
-          format: 'cjs',
-          sourcemap: true,
-          exports: 'auto',
-        },
         {
           file: `lib/${_folder}index.mjs`,
           format: 'esm',
@@ -33,7 +28,7 @@ function build({ folder = '' } = {}) {
             },
           },
         }),
-        //terser(),
+        terser(),
       ],
     },
   ];
