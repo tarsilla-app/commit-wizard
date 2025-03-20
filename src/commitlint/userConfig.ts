@@ -1,8 +1,8 @@
 import { UserConfig } from '@commitlint/types';
 
-import Config from '../types/Config.js';
+import CommitWizardOptions from '../types/CommitWizardOptions.js';
 
-function userConfig({ maxLineLength }: Config): UserConfig {
+function userConfig({ maxLineLength }: CommitWizardOptions): UserConfig {
   return {
     extends: ['@commitlint/config-conventional'],
     parserPreset: {

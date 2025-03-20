@@ -1,6 +1,6 @@
 import { Commitizen, Prompter, Question } from 'commitizen';
 
-import Config from '../types/Config.js';
+import CommitWizardOptions from '../types/CommitWizardOptions.js';
 
 export type CommitAnswers = {
   type: string;
@@ -27,7 +27,7 @@ function getMaxSubject({ answers, maxLineLength }: { answers: CommitAnswers; max
   return maxSubject;
 }
 
-function prompter({ maxLineLength }: Config): Prompter {
+function prompter({ maxLineLength }: CommitWizardOptions): Prompter {
   return {
     prompter: function (cz: Commitizen, commit: (message: string) => void) {
       const questions: Question<CommitAnswers> = [

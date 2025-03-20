@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 
-import Config from '../types/Config.js';
+import CommitWizardOptions from '../types/CommitWizardOptions.js';
 
-const config: Config = {
+const config: CommitWizardOptions = {
   maxLineLength: 120,
 };
 const file = 'commit-wizard.config.json';
 
-function configLoader(): Config {
+function configLoader(): CommitWizardOptions {
   const configPath = path.resolve(process.cwd(), file);
 
   if (!fs.existsSync(configPath)) {
