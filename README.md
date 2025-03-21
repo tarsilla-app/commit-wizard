@@ -25,7 +25,7 @@ yarn add --dev @tarsilla/commit-wizard
 
 ## Usage
 
-### Commitizen
+### commitizen
 
 Create a `.czrc` file in your project root with the following content:
 
@@ -37,7 +37,7 @@ Create a `.czrc` file in your project root with the following content:
 
 When you run `npx git-cz`, Commitizen will present you with an interactive prompt to format your commit messages.
 
-### Commitlint
+### commitlint
 
 Create a `commitlint.config.mjs` file in your project root with the following content:
 
@@ -50,7 +50,7 @@ export default {
 Commitlint enforces commit message conventions by using the conventional commits preset.
 It is recommended to run commitlint during your commit process, ex. using husky (e.g. see [.husky/commit-msg](src/commitlint/commit-msg)).
 
-### Semantic-release
+### semantic-release
 
 Create a `.releaserc.cjs` file in your project root with the following content:
 
@@ -65,7 +65,7 @@ module.exports = {
 The semantic-release configuration automates version management and changelog generation. 
 It is recommended to configure CI/CD to run semantic-release, ex. using github actions (e.g. see [.github/workflows/npm-publish.yml](src/semantic-release/npm-publish.yml)).
 
-## Customization
+## Configuration Options
 
 You can override default settings by creating a `commit-wizard.config.json` file in your project root.
 The plugin accepts an object of type `CommitWizardOptions`:
@@ -74,8 +74,8 @@ The plugin accepts an object of type `CommitWizardOptions`:
 |----------|--------|--------------------------------------------------------------|-------------|
 | maxLineLength | number | The maximum length of the commit message. If not provided, the plugin will run with the default settings. | 120 |
 
-
 Example `commit-wizard.config.json`:
+
 ```json
 {
   "maxLineLength": 100
