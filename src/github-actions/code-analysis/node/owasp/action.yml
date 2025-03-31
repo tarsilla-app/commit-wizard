@@ -3,7 +3,7 @@ description: Github action to execute OWASP dependency check as part of a github
 inputs:
   project:
     required: true
-  suppression-file:
+  suppression:
     required: false
 runs:
   using: composite
@@ -28,7 +28,7 @@ runs:
         path: .
         format: HTML
         out: reports
-        suppression-file: ${{ inputs.suppression-file }}
+        suppression: ${{ inputs.suppression }}
 
     - name: Upload OWASP report
       uses: actions/upload-artifact@master

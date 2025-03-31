@@ -6,7 +6,7 @@ on:
       project:
         required: true
         type: string
-      suppression-file:
+      suppression:
         required: false
         type: string
 jobs:
@@ -20,7 +20,7 @@ jobs:
         uses: ./src/github-actions/code-analysis/node/owasp
         with:
           project: ${{ inputs.project }}
-          suppression-file: ${{ inputs.suppression-file }}
+          suppression: ${{ inputs.suppression }}
   codeql:
     runs-on: ubuntu-latest
     strategy:

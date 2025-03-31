@@ -10,7 +10,7 @@ inputs:
   out:
     required: true
     default: reports
-  suppression-file:
+  suppression:
     required: false
 runs:
   using: docker
@@ -20,4 +20,4 @@ runs:
     - ${{ inputs.path }}
     - ${{ inputs.format }}
     - ${{ inputs.out }}
-    - ${{ inputs.suppression-file }}
+    - ${{ inputs.suppression }}
