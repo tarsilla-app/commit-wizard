@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/snyk-test
+        uses: ./src/github-actions/code-analysis/node/snyk/test
         with:
           token: ${{ secrets.token }}
   owasp:
@@ -34,7 +34,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/snyk-code-test
+        uses: ./src/github-actions/code-analysis/node/snyk/code-test
         with:
           token: ${{ secrets.token }}
   codeql:
