@@ -29,4 +29,4 @@ runs:
     - '--enableRetired'
     - '--failOnCVSS'
     - '7'
-    - ${{ fromJson(inputs.args) }}
+    - ${{ inputs.args }}

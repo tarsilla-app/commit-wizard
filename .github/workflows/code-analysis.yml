@@ -10,4 +10,5 @@ jobs:
     uses: ./.github/workflows/node.yml
     with:
       project: 'Tarsilla - Commit Wizard'
-      args: '["--suppression", "suppression.xml"]'
+      args: |
+        --suppression suppression.xml
