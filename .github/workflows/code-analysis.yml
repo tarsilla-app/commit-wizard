@@ -6,7 +6,7 @@ on:
 
 jobs:
   code-analysis:
-    uses: ./src/github-actions/code-analysis/node/workflow.yml
+    uses: ./src/github-actions/code-analysis/node/workflow.yml@main
     with:
       project: 'Tarsilla - Commit Wizard'
       args: >
