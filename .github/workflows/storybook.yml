@@ -2,6 +2,11 @@ name: NodeJS CI
 description: Github workflow to execute ci as part of a github workflow for NodeJS projects
 on:
   workflow_call:
+    inputs:
+      local-actions:
+        required: false
+        type: boolean
+        default: false
     outputs:
       page_url:
         description: The URL of the page
@@ -10,13 +15,21 @@ jobs:
   deploy-storybook:
     runs-on: ubuntu-latest
     outputs:
-      page_url: ${{ steps.deploy.outputs.page_url }}
+      page_url: ${{ steps.url.outputs.page_url }}
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.url.outputs.page_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - id: deploy-local
+        name: Deploy Storybook to Github Pages
+        if: ${{ inputs.local-actions }}
+        uses: ./src/github-actions/deploy/github-pages/storybook
       - id: deploy
         name: Deploy Storybook to Github Pages
-        uses: ./src/github-actions/deploy/github-pages/storybook
+        if: ${{ !inputs.local-actions }}
+        uses: tarsilla-app/commit-wizard/src/github-actions/deploy/github-pages/storybook@main
+      - id: url
+        name: Determine Page URL
+        run: echo "page_url=$([[ -n '${{ steps.deploy.outputs.page_url }}' ]] && echo '${{ steps.deploy.outputs.page_url }}' || echo '${{ steps.deploy-local.outputs.page_url }}')" >> $GITHUB_ENV

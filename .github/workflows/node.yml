@@ -3,6 +3,10 @@ description: Github workflow to execute ci as part of a github workflow for Node
 on:
   workflow_call:
     inputs:
+      local-actions:
+        required: false
+        type: boolean
+        default: false
       suppression:
         required: false
         type: boolean
@@ -21,14 +25,19 @@ on:
 jobs:
   snyk-test:
     uses: ./.github/workflows/snyk-test.yml
+    with:
+      local-actions: ${{ inputs.local-actions }}
     secrets:
       token: ${{ secrets.snyk-token }}
   owasp:
     uses: ./.github/workflows/owasp.yml
     with:
+      local-actions: ${{ inputs.local-actions }}
       suppression: ${{ inputs.suppression }}
   snyk-code-test:
     uses: ./.github/workflows/snyk-code-test.yml
+    with:
+      local-actions: ${{ inputs.local-actions }}
     secrets:
       token: ${{ secrets.snyk-token }}
   codeql:
@@ -37,9 +46,13 @@ jobs:
     if: ${{ inputs.publish == 'npm' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
     uses: ./.github/workflows/npm.yml
+    with:
+      local-actions: ${{ inputs.local-actions }}
     secrets:
       token: ${{ secrets.npm-token }}
   deploy-storybook:
     if: ${{ inputs.deploy == 'storybook' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
     uses: ./.github/workflows/storybook.yml
+    with:
+      local-actions: ${{ inputs.local-actions }}

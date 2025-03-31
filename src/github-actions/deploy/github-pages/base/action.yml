@@ -2,13 +2,10 @@ name: Deploy to Github Pages
 description: Github action to deploy to github pages as part of a github workflow for NodeJS projects
 inputs:
   path:
-    description: Specifies the path of the static assets after building
     required: true
   install:
-    description: Specifies the command to run the installation.
     required: true
   build:
-    description: Specifies the command to run after install for the build
     required: true
 outputs:
   page_url:

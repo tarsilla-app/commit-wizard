@@ -2,6 +2,11 @@ name: NodeJS CI
 description: Github workflow to execute ci as part of a github workflow for NodeJS projects
 on:
   workflow_call:
+    inputs:
+      local-actions:
+        required: false
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
@@ -12,6 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Snyk Test
+        if: ${{ inputs.local-actions }}
         uses: ./src/github-actions/code-analysis/node/snyk/test
+        with:
+          token: ${{ secrets.token }}
+      - name: Run Snyk Test
+        if: ${{ !inputs.local-actions }}
+        uses: tarsilla-app/commit-wizard/src/github-actions/code-analysis/node/snyk/test@main
         with:
           token: ${{ secrets.token }}

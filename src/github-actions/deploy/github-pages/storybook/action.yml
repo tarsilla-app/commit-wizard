@@ -2,14 +2,11 @@ name: Deploy Storybook to Github Pages
 description: Github action to deploy storybook to github pages as part of a github workflow for NodeJS projects
 inputs:
   path:
-    description: Specifies the path of the static assets after building
-    required: true
+    required: false
   install:
-    description: Specifies the command to run the installation.
-    required: true
+    required: false
   build:
-    description: Specifies the command to run after install for the build
-    required: true
+    required: false
 outputs:
   page_url:
     description: The URL of the page

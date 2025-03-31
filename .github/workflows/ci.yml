@@ -12,6 +12,7 @@ jobs:
     with:
       suppression: true
       publish: npm
+      local-actions: true
     secrets: 
       snyk-token: ${{ secrets.SNYK_TOKEN }}
       npm-token: ${{ secrets.NPM_TOKEN }}
