@@ -1,12 +1,9 @@
-name: Code Analysis
+name: CI
 on:
   push:
     branches: [main]
 jobs:
-  code-analysis:
-    permissions:
-      actions: read
-      security-events: write
+  ci:
     uses: ./.github/workflows/node.yml
     with:
       suppression: true

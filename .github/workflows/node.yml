@@ -1,5 +1,5 @@
-name: NodeJS Code Analysis
-description: Github workflow to execute code analysis as part of a github workflow for NodeJS projects
+name: NodeJS CI
+description: Github workflow to execute ci as part of a github workflow for NodeJS projects
 on:
   workflow_call:
     inputs:
@@ -47,6 +47,11 @@ jobs:
         with:
           token: ${{ secrets.snyk-token }}
   codeql:
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -56,6 +61,11 @@ jobs:
       - name: Run CodeQL Analysis
         uses: ./src/github-actions/code-analysis/node/codeql
   publish-npm:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     if: ${{ inputs.publish == 'npm' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
     runs-on: ubuntu-latest
@@ -67,6 +77,10 @@ jobs:
         with:
           npm-token: ${{ secrets.npm-token }}
   deploy-storybook:
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     if: ${{ inputs.deploy == 'storybook' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
     runs-on: ubuntu-latest
