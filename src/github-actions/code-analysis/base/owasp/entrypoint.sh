@@ -10,9 +10,11 @@ args=(--project "${INPUT_PROJECT}" \
       --enableRetired \
       --failOnCVSS 7)
 
+echo $INPUT_SUPPRESSION_FILE
+
 # If the suppression input is provided, append the flag.
-if [ -n "${INPUT_SUPPRESSION-FILE}" ]; then
-    args+=(--suppression "${INPUT_SUPPRESSION-FILE}")
+if [ -n "${INPUT_SUPPRESSION_FILE}" ]; then
+    args+=(--suppression "${INPUT_SUPPRESSION_FILE}")
 fi
 
 # Execute OWASP Dependency-Check with the built arguments.
