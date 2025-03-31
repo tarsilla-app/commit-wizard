@@ -1,0 +1,20 @@
+name: NodeJS CI
+description: Github workflow to execute ci as part of a github workflow for NodeJS projects
+on:
+  workflow_call:
+    secrets:
+      token:
+        required: false
+jobs:
+  publish:
+    permissions:
+      contents: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Publish to NPM
+        uses: ./src/github-actions/publish/npm
+        with:
+          token: ${{ secrets.token }}

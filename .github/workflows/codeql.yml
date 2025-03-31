@@ -1,0 +1,16 @@
+name: NodeJS CI
+description: Github workflow to execute ci as part of a github workflow for NodeJS projects
+on:
+  workflow_call:
+jobs:
+  codeql:
+    permissions:
+      security-events: write
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run CodeQL Analysis
+        uses: ./src/github-actions/code-analysis/node/codeql

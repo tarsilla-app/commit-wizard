@@ -5,13 +5,10 @@ on:
 jobs:
   ci:
     permissions:
-      #actions: read
       security-events: write
       contents: write
-      #issues: write
-      #pull-requests: write
       id-token: write
-      pages: write # TODO split workflows and dont require this
+      #pages: write
     uses: ./.github/workflows/node.yml
     with:
       suppression: true

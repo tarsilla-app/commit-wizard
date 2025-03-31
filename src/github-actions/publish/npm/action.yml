@@ -1,7 +1,7 @@
 name: NPM Publish
 description: Github action to publish to npm as part of a github workflow for NodeJS projects
 inputs:
-  npm-token:
+  token:
     required: true
 runs:
   using: composite
@@ -22,4 +22,4 @@ runs:
       run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ github.token }}
-        NPM_TOKEN: ${{ inputs.npm-token }}
+        NPM_TOKEN: ${{ inputs.token }}

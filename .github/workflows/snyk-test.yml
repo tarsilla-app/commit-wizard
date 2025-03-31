@@ -1,0 +1,17 @@
+name: NodeJS CI
+description: Github workflow to execute ci as part of a github workflow for NodeJS projects
+on:
+  workflow_call:
+    secrets:
+      token:
+        required: true
+jobs:
+  snyk-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Snyk Test
+        uses: ./src/github-actions/code-analysis/node/snyk/test
+        with:
+          token: ${{ secrets.token }}

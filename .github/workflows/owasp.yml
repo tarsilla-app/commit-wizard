@@ -1,0 +1,19 @@
+name: NodeJS CI
+description: Github workflow to execute ci as part of a github workflow for NodeJS projects
+on:
+  workflow_call:
+    inputs:
+      suppression:
+        required: false
+        type: boolean
+        default: false
+jobs:
+  owasp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run OWASP Dependency-Check
+        uses: ./src/github-actions/code-analysis/node/owasp
+        with:
+          suppression: ${{ inputs.suppression }}

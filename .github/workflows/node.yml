@@ -20,67 +20,26 @@ on:
         required: false
 jobs:
   snyk-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Snyk Test
-        uses: ./src/github-actions/code-analysis/node/snyk/test
-        with:
-          token: ${{ secrets.snyk-token }}
+    uses: ./.github/workflows/snyk-test.yml
+    secrets:
+      token: ${{ secrets.snyk-token }}
   owasp:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/owasp
-        with:
-          suppression: ${{ inputs.suppression }}
+    uses: ./.github/workflows/owasp.yml
+    with:
+      suppression: ${{ inputs.suppression }}
   snyk-code-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Snyk Code Test
-        uses: ./src/github-actions/code-analysis/node/snyk/code-test
-        with:
-          token: ${{ secrets.snyk-token }}
+    uses: ./.github/workflows/snyk-code-test.yml
+    secrets:
+      token: ${{ secrets.snyk-token }}
   codeql:
-    permissions:
-      security-events: write
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run CodeQL Analysis
-        uses: ./src/github-actions/code-analysis/node/codeql
+    uses: ./.github/workflows/codeql.yml
   publish-npm:
-    permissions:
-      contents: write
-      id-token: write
     if: ${{ inputs.publish == 'npm' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Publish to NPM
-        uses: ./src/github-actions/publish/npm
-        with:
-          npm-token: ${{ secrets.npm-token }}
+    uses: ./.github/workflows/npm.yml
+    secrets:
+      token: ${{ secrets.npm-token }}
   deploy-storybook:
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     if: ${{ inputs.deploy == 'storybook' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Deploy Storybook to Github Pages
-        uses: ./src/github-actions/deploy/github-pages/storybook
+    uses: ./.github/workflows/storybook.yml
