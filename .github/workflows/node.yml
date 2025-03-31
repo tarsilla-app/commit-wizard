@@ -3,9 +3,6 @@ description: Github workflow to execute code analysis as part of a github workfl
 on:
   workflow_call:
     inputs:
-      project:
-        required: true
-        type: string
       suppression:
         required: false
         type: boolean
@@ -19,7 +16,6 @@ jobs:
       - name: Run OWASP Dependency-Check
         uses: ./src/github-actions/code-analysis/node/owasp
         with:
-          project: ${{ inputs.project }}
           suppression: ${{ inputs.suppression }}
   codeql:
     runs-on: ubuntu-latest

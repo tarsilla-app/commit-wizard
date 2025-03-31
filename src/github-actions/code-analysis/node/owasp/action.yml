@@ -1,8 +1,6 @@
 name: OWASP Dependency-Check
 description: Github action to execute OWASP dependency check as part of a github workflow for NodeJS projects
 inputs:
-  project:
-    required: true
   suppression:
     required: false
 runs:
@@ -24,7 +22,7 @@ runs:
     - name: Run OWASP Dependency-Check
       uses: ./src/github-actions/code-analysis/base/owasp
       with:
-        project: ${{ inputs.project }}
+        project: ${{ github.repository }}
         path: .
         format: HTML
         out: reports
