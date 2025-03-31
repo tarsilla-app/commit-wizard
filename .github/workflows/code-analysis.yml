@@ -10,3 +10,5 @@ jobs:
     uses: ./.github/workflows/node.yml
     with:
       suppression: true
+    secrets: 
+      token: ${{ secrets.SNYK_TOKEN }}

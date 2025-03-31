@@ -1,0 +1,24 @@
+name: Snyk Test
+description: Github action to execute Snyk test as part of a github workflow
+inputs:
+  project:
+    required: true
+  token:
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Run Snyk Test
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ inputs.token }}
+      with:
+        command: test
+        args: --severity-threshold=high
+    - name: Run Snyk Monitor
+      uses: snyk/actions/node@master
+      with:
+        command: monitor
+        args: --project-name="${{ inputs.project }}"
+      env:
+        SNYK_TOKEN: ${{ inputs.token }}

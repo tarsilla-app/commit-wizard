@@ -1,0 +1,30 @@
+name: OWASP Dependency-Check
+description: Github action to execute OWASP dependency check as part of a github workflow
+inputs:
+  project:
+    required: true
+  path:
+    required: true
+  format:
+    required: true
+  out:
+    required: true
+    default: reports
+  suppression:
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Run OWASP Dependency-Check
+      uses: ./src/github-actions/code-analysis/base/owasp/owasp.yml
+      with:
+        project: ${{ inputs.project }}
+        path: ${{ inputs.path }}
+        format: ${{ inputs.format }}
+        out: ${{ inputs.out }}
+        suppression: ${{ inputs.suppression }}
+    - name: Upload OWASP report
+      uses: actions/upload-artifact@master
+      with:
+        name: OWASP report
+        path: ${{ github.workspace }}/${{ inputs.out }}

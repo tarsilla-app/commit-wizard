@@ -16,9 +16,13 @@ runs:
       with:
         languages: ${{ inputs.language }}
         build-mode: ${{ inputs.build-mode }}
-      
     - name: Run CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: /language:${{ inputs.language }}
         output: ${{ github.workspace }}/${{ inputs.out }}/codeql-results.sarif
+    - name: Upload CodeQL report
+      uses: actions/upload-artifact@master
+      with:
+        name: CodeQL report
+        path: ${{ github.workspace }}/${{ inputs.out }}

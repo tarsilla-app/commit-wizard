@@ -6,17 +6,37 @@ on:
       suppression:
         required: false
         type: boolean
+    secrets:
+      token:
+        required: true
 jobs:
+  snyk-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run OWASP Dependency-Check
+        uses: ./src/github-actions/code-analysis/node/snyk-test.yml
+        with:
+          token: ${{ secrets.token }}
   owasp:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/owasp
+        uses: ./src/github-actions/code-analysis/node/owasp.yml
         with:
           suppression: ${{ inputs.suppression }}
+  snyk-code-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run OWASP Dependency-Check
+        uses: ./src/github-actions/code-analysis/node/snyk-code-test.yml
+        with:
+          token: ${{ secrets.token }}
   codeql:
     runs-on: ubuntu-latest
     strategy:
@@ -24,9 +44,5 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Run CodeQL Analysis
-        uses: ./src/github-actions/code-analysis/node/codeql
-        with:
-          language: javascript-typescript
-          build-mode: none
+        uses: ./src/github-actions/code-analysis/node/codeql.yml

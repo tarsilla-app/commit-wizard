@@ -1,0 +1,19 @@
+name: OWASP Dependency-Check
+description: Github action to execute OWASP dependency check as part of a github workflow for NodeJS projects
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        registry-url: https://registry.npmjs.org
+    - name: Install dependencies
+      run: npm ci
+      shell: bash
+    - name: Run CodeQL Analysis
+      uses: ./src/github-actions/code-analysis/base/codeql/base.yml
+      with:
+        language: javascript-typescript
+        build-mode: none
+        out: reports
