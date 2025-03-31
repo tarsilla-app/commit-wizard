@@ -6,10 +6,7 @@ on:
       token:
         required: false
 jobs:
-  publish:
-    permissions:
-      contents: write
-      id-token: write
+  publish-npm:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

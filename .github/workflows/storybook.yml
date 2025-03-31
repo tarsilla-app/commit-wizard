@@ -3,11 +3,7 @@ description: Github workflow to execute ci as part of a github workflow for Node
 on:
   workflow_call:
 jobs:
-  deploy:
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+  deploy-storybook:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

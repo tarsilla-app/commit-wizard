@@ -9,6 +9,8 @@ inputs:
     required: true
     default: reports
 runs:
+  #permissions:
+  #  security-events: write # to be set in workflow run
   using: composite
   steps:
     - name: Initialize CodeQL

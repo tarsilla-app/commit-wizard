@@ -4,6 +4,9 @@ inputs:
   token:
     required: true
 runs:
+  #permissions:
+  #  contents: write # to be set in workflow run
+  #  id-token: write # to be set in workflow run
   using: composite
   steps:
     - name: Setup Node.js
