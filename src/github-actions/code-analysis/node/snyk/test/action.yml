@@ -15,7 +15,7 @@ runs:
       run: npm ci
       shell: bash
     - name: Run Snyk Test
-      uses: ./src/github-actions/code-analysis/base/snyk/test/node.yml
+      uses: ./src/github-actions/code-analysis/base/snyk/test/node
       with:
         project: ${{ github.repository }}
         token: ${{ inputs.token }}

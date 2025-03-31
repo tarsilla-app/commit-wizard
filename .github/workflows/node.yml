@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/snyk-test.yml
+        uses: ./src/github-actions/code-analysis/node/snyk-test
         with:
           token: ${{ secrets.token }}
   owasp:
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/owasp.yml
+        uses: ./src/github-actions/code-analysis/node/owasp
         with:
           suppression: ${{ inputs.suppression }}
   snyk-code-test:
@@ -34,7 +34,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run OWASP Dependency-Check
-        uses: ./src/github-actions/code-analysis/node/snyk-code-test.yml
+        uses: ./src/github-actions/code-analysis/node/snyk-code-test
         with:
           token: ${{ secrets.token }}
   codeql:
@@ -45,4 +45,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run CodeQL Analysis
-        uses: ./src/github-actions/code-analysis/node/codeql.yml
+        uses: ./src/github-actions/code-analysis/node/codeql

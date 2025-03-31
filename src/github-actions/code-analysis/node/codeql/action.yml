@@ -12,7 +12,7 @@ runs:
       run: npm ci
       shell: bash
     - name: Run CodeQL Analysis
-      uses: ./src/github-actions/code-analysis/base/codeql/base.yml
+      uses: ./src/github-actions/code-analysis/base/codeql
       with:
         language: javascript-typescript
         build-mode: none
