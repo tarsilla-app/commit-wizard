@@ -9,6 +9,5 @@ jobs:
       security-events: write
     uses: ./.github/workflows/node.yml
     with:
-      project: 'Tarsilla - Commit Wizard'
-      args: |
-        --suppression suppression.xml
+      project: Tarsilla - Commit Wizard
+      suppression-file: suppression.xml

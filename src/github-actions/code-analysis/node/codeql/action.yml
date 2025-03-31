@@ -1,19 +1,18 @@
-name: 'OWASP Dependency-Check'
-description: 'Github action to execute OWASP dependency check as part of a github workflow for NodeJS projects'
-Author: '@tarsilla'
+name: OWASP Dependency-Check
+description: Github action to execute OWASP dependency check as part of a github workflow for NodeJS projects
 inputs:
   language:
     required: true
   build-mode:
     required: true
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22.x'
-        registry-url: 'https://registry.npmjs.org'
+        node-version: 22.x
+        registry-url: https://registry.npmjs.org
 
     - name: Install dependencies
       run: npm ci
@@ -24,7 +23,7 @@ runs:
       with:
         language: ${{ inputs.language }}
         build-mode: ${{ inputs.build-mode }}
-        out: 'reports'
+        out: reports
 
     - name: Upload CodeQL report
       uses: actions/upload-artifact@master
