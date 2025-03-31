@@ -4,6 +4,9 @@ on:
     branches: [main]
 jobs:
   code-analysis:
+    permissions:
+      actions: read
+      security-events: write
     uses: ./.github/workflows/node.yml
     with:
       project: 'Tarsilla - Commit Wizard'
