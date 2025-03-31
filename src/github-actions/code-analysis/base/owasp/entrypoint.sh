@@ -10,7 +10,9 @@ args=(--project "${INPUT_PROJECT}" \
       --enableRetired \
       --failOnCVSS 7)
 
-echo $INPUT_SUPPRESSION_FILE
+echo 1 $INPUT_SUPPRESSION_FILE
+echo 2 "${INPUT_SUPPRESSION-FILE}"
+echo 3 "${INPUT_SUPPRESSION_FILE}"
 
 # If the suppression input is provided, append the flag.
 if [ -n "${INPUT_SUPPRESSION_FILE}" ]; then
