@@ -1,0 +1,32 @@
+name: 'OWASP Dependency-Check'
+description: 'Github action to execute OWASP dependency check as part of a github workflow'
+Author: '@tarsilla'
+inputs:
+  project:
+    required: true
+  path:
+    required: true  
+  format:
+    required: true
+  out:
+    required: true
+    default: 'reports'
+  args:
+    required: false
+runs:
+  using: 'docker'
+  image: 'docker://owasp/dependency-check-action:latest'
+  args:
+    - '--project'
+    - '${{ inputs.project }}'
+    - '--scan'
+    - '${{ github.workspace }}/${{ inputs.path }}'
+    - '--format' 
+    - '${{ inputs.format }}'
+    - '--out'
+    - '${{ github.workspace }}/${{ inputs.out }}'
+    - '--noupdate'
+    - '--enableRetired'
+    - '--failOnCVSS'
+    - '7'
+    - ${{ inputs.args }}

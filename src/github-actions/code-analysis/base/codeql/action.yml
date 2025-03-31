@@ -1,0 +1,25 @@
+name: 'CodeQL Analyze'
+description: 'Github action to execute CodeQL analyze as part of a github workflow'
+Author: '@tarsilla'
+inputs:
+  language:
+    required: true
+  build-mode:
+    required: true  
+  out:
+    required: true
+    default: 'reports'
+runs:
+  using: 'composite'
+  steps:
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ inputs.language }}
+        build-mode: ${{ inputs.build-mode }}
+      
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: '/language:${{ inputs.language }}'
+        output: '${{ github.workspace }}/${{ inputs.out }}/codeql-results.sarif'
