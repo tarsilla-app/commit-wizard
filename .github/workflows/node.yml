@@ -58,8 +58,6 @@ jobs:
   publish-npm:
     permissions:
       contents: write
-      issues: write
-      pull-requests: write
       id-token: write
     if: ${{ inputs.publish == 'npm' }}
     needs: [snyk-test, owasp, snyk-code-test, codeql]
