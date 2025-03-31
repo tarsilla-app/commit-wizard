@@ -1,12 +1,10 @@
 name: Code Analysis
-
 on:
   push:
     branches: [main]
-
 jobs:
   code-analysis:
-    uses: ./src/github-actions/code-analysis/node/workflow.yml@main
+    uses: ./.github/workflows/node.yml
     with:
       project: 'Tarsilla - Commit Wizard'
       args: >
