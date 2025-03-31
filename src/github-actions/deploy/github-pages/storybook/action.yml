@@ -1,0 +1,26 @@
+name: Deploy Storybook to Github Pages
+description: Github action to deploy storybook to github pages as part of a github workflow for NodeJS projects
+inputs:
+  path:
+    description: Specifies the path of the static assets after building
+    required: true
+  install:
+    description: Specifies the command to run the installation.
+    required: true
+  build:
+    description: Specifies the command to run after install for the build
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        registry-url: https://registry.npmjs.org
+    - name: Deploy Storybook to Github Pages
+      uses: ./src/github-actions/deploy/github-pages/base
+      with:
+        path: storybook-static
+        install: npm ci
+        build: npm run build-storybook

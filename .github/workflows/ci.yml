@@ -10,5 +10,7 @@ jobs:
     uses: ./.github/workflows/node.yml
     with:
       suppression: true
+      publish: npm
     secrets: 
-      token: ${{ secrets.SNYK_TOKEN }}
+      snyk-token: ${{ secrets.SNYK_TOKEN }}
+      npm-token: ${{ secrets.NPM_TOKEN }}

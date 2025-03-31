@@ -1,0 +1,34 @@
+name: Deploy to Github Pages
+description: Github action to deploy to github pages as part of a github workflow for NodeJS projects
+inputs:
+  path:
+    description: Specifies the path of the static assets after building
+    required: true
+  install:
+    description: Specifies the command to run the installation.
+    required: true
+  build:
+    description: Specifies the command to run after install for the build
+    required: true
+outputs:
+  page_url:
+    description: The URL of the page
+    value: ${{ steps.deploy.outputs.page_url }}
+runs:
+  using: composite
+  steps:
+    - name: Install
+      shell: bash
+      run: ${{ inputs.install_command }}
+    - name: Build
+      shell: bash
+      run: ${{ inputs.build }}
+    - name: Upload files
+      uses: actions/upload-pages-artifact@v3
+      with: 
+        path: ${{ inputs.path }}
+    - id: deploy
+      name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
+      with:
+        token: ${{ github.token }}
