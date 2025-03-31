@@ -8,7 +8,7 @@ on:
         type: string
       suppression:
         required: false
-        type: string
+        type: boolean
 jobs:
   owasp:
     runs-on: ubuntu-latest

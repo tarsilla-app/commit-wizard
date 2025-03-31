@@ -10,4 +10,4 @@ jobs:
     uses: ./.github/workflows/node.yml
     with:
       project: Tarsilla - Commit Wizard
-      suppression: ./suppressions.xml
+      suppression: true
