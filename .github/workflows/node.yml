@@ -9,6 +9,7 @@ on:
       args:
         required: false
         type: string
+        default: ''
 jobs:
   owasp:
     runs-on: ubuntu-latest

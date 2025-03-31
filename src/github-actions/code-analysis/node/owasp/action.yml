@@ -17,9 +17,10 @@ runs:
 
     - name: Install dependencies
       run: npm ci
+      shell: bash
 
     - name: Run OWASP Dependency-Check
-      uses: ../../base/owasp
+      uses: ./src/github-actions/code-analysis/base/owasp
       with:
         project: ${{ inputs.project }}
         path: '.'
