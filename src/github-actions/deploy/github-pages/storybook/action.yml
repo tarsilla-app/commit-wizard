@@ -10,6 +10,10 @@ inputs:
   build:
     description: Specifies the command to run after install for the build
     required: true
+outputs:
+  page_url:
+    description: The URL of the page
+    value: ${{ steps.deploy.outputs.page_url }}
 runs:
   using: composite
   steps:
@@ -18,7 +22,8 @@ runs:
       with:
         node-version: 22.x
         registry-url: https://registry.npmjs.org
-    - name: Deploy Storybook to Github Pages
+    - id: deploy
+      name: Deploy Storybook to Github Pages
       uses: ./src/github-actions/deploy/github-pages/base
       with:
         path: storybook-static

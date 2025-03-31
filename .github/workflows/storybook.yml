@@ -2,11 +2,21 @@ name: NodeJS CI
 description: Github workflow to execute ci as part of a github workflow for NodeJS projects
 on:
   workflow_call:
+    outputs:
+      page_url:
+        description: The URL of the page
+        value: ${{ jobs.deploy-storybook.outputs.page_url }}
 jobs:
   deploy-storybook:
     runs-on: ubuntu-latest
+    outputs:
+      page_url: ${{ steps.deploy.outputs.page_url }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Deploy Storybook to Github Pages
+      - id: deploy
+        name: Deploy Storybook to Github Pages
         uses: ./src/github-actions/deploy/github-pages/storybook
