@@ -16,4 +16,4 @@ if [ -n "${INPUT_SUPPRESSION_FILE}" ]; then
 fi
 
 # Execute OWASP Dependency-Check with the built arguments.
-exec dependency-check "${args[@]}"
+/usr/share/dependency-check/bin/dependency-check.sh ${args[@]}
