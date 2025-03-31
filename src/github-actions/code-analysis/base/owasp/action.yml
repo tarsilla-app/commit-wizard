@@ -5,7 +5,7 @@ inputs:
   project:
     required: true
   path:
-    required: true  
+    required: true
   format:
     required: true
   out:

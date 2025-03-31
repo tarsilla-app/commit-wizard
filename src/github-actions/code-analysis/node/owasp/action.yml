@@ -9,6 +9,9 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -23,9 +26,9 @@ runs:
       uses: ./src/github-actions/code-analysis/base/owasp
       with:
         project: ${{ inputs.project }}
-        path: '.'
-        format: 'HTML'
-        out: 'reports'
+        path: .
+        format: HTML
+        out: reports
         args: ${{ inputs.args }}
 
     - name: Upload OWASP report
