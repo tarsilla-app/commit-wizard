@@ -47,6 +47,8 @@ jobs:
         with:
           token: ${{ secrets.snyk-token }}
   codeql:
+    permissions:
+      security-events: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
