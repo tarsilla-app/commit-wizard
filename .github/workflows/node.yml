@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run OWASP Dependency-Check
-        uses: ./owasp
+        uses: ./src/github-actions/code-analysis/node/owasp
         with:
           project: ${{ inputs.project }}
           args: ${{ inputs.args }}
@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Run CodeQL Analysis
-        uses: ./codeql
+        uses: ./src/github-actions/code-analysis/node/codeql
         with:
           language: javascript-typescript
           build-mode: none
