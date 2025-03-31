@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Run OWASP Dependency-Check
+      - name: Run Snyk Test
         uses: ./src/github-actions/code-analysis/node/snyk/test
         with:
           token: ${{ secrets.token }}
@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Run OWASP Dependency-Check
+      - name: Run Snyk Code Test
         uses: ./src/github-actions/code-analysis/node/snyk/code-test
         with:
           token: ${{ secrets.token }}

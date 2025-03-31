@@ -14,7 +14,7 @@ runs:
     - name: Install dependencies
       run: npm ci
       shell: bash
-    - name: Run Snyk Test
+    - name: Run Snyk Code Test
       uses: ./src/github-actions/code-analysis/base/snyk/code-test/node
       with:
         token: ${{ inputs.token }}
