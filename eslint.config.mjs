@@ -7,35 +7,37 @@ import { config, configs } from 'typescript-eslint';
 
 const eslintConfig = config(
   //ignores
-  {
+  ...config({
     ignores: ['**/.vscode/', '**/node_modules/', '**/lib/'],
-  },
+  }),
   //all
-  js.configs.recommended,
-  ...configs.stylistic,
-  ...configs.stylisticTypeChecked,
-  {
-    languageOptions: {
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: true,
-        tsconfigRootDir: './',
+  ...config([
+    js.configs.recommended,
+    ...configs.stylistic,
+    ...configs.stylisticTypeChecked,
+    {
+      languageOptions: {
+        parserOptions: {
+          ecmaVersion: 'latest',
+          sourceType: 'module',
+          project: true,
+          tsconfigRootDir: './',
+        },
+        globals: {
+          ...globals.builtin,
+          ...globals.es2021,
+          ...globals.node,
+        },
       },
-      globals: {
-        ...globals.builtin,
-        ...globals.es2021,
-        ...globals.node,
+      rules: {
+        '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+        '@typescript-eslint/explicit-module-boundary-types': 'error',
+        '@typescript-eslint/no-explicit-any': 'error',
       },
     },
-    rules: {
-      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-      '@typescript-eslint/explicit-module-boundary-types': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
-    },
-  },
+  ]),
   //unused-imports
-  {
+  ...config({
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -53,9 +55,9 @@ const eslintConfig = config(
         },
       ],
     },
-  },
+  }),
   //sort-imports
-  {
+  ...config({
     rules: {
       'sort-imports': [
         'error',
@@ -66,72 +68,82 @@ const eslintConfig = config(
         },
       ],
     },
-  },
+  }),
   //imports
-  imports.flatConfigs.recommended,
-  imports.flatConfigs.typescript,
-  {
-    rules: {
-      'import/order': [
-        'error',
-        {
-          groups: ['builtin', 'external', 'internal', ['parent', 'sibling']],
-          pathGroups: [
-            {
-              pattern: 'react',
-              group: 'external',
-              position: 'before',
+  ...config([
+    imports.flatConfigs.recommended,
+    imports.flatConfigs.typescript,
+    {
+      rules: {
+        'import/order': [
+          'error',
+          {
+            groups: ['builtin', 'external', 'internal', ['parent', 'sibling']],
+            pathGroups: [
+              {
+                pattern: 'react',
+                group: 'external',
+                position: 'before',
+              },
+              {
+                pattern: '@tarsilla/**',
+                group: 'internal',
+                position: 'before',
+              },
+            ],
+            pathGroupsExcludedImportTypes: ['react', '@tarsilla'],
+            'newlines-between': 'always',
+            alphabetize: {
+              order: 'asc',
+              caseInsensitive: true,
             },
-            {
-              pattern: '@tarsilla/**',
-              group: 'internal',
-              position: 'before',
-            },
-          ],
-          pathGroupsExcludedImportTypes: ['react', '@tarsilla'],
-          'newlines-between': 'always',
-          alphabetize: {
-            order: 'asc',
-            caseInsensitive: true,
           },
+        ],
+      },
+      settings: {
+        'import/resolver': {
+          typescript: true,
+          node: true,
         },
-      ],
-    },
-    settings: {
-      'import/resolver': {
-        typescript: true,
-        node: true,
       },
     },
-  },
+  ]),
   //javascript
   {
     files: ['**/*.{cjs,mjs,js,jsx}'],
     extends: [configs.disableTypeChecked],
   },
+  //javascript
+  ...config({
+    files: ['**/*.{cjs,mjs,js,jsx}'],
+    extends: [configs.disableTypeChecked],
+  }),
   //prettier
-  prettierRecommended,
-  {
-    rules: {
-      'prettier/prettier': [
-        'error',
-        {
-          semi: true,
-          trailingComma: 'all',
-          singleQuote: true,
-          jsxSingleQuote: true,
-          printWidth: 120,
-          tabWidth: 2,
-        },
-        {
-          usePrettierrc: false,
-          fileInfoOptions: {
-            withNodeModules: true,
+  ...config([
+    prettierRecommended,
+    {
+      rules: {
+        ...prettierRecommended.rules,
+        'prettier/prettier': [
+          'error',
+          {
+            semi: true,
+            trailingComma: 'all',
+            singleQuote: true,
+            jsxSingleQuote: true,
+            printWidth: 120,
+            tabWidth: 2,
           },
-        },
-      ],
+          {
+            usePrettierrc: false,
+            fileInfoOptions: {
+              withNodeModules: true,
+            },
+          },
+        ],
+      },
     },
-  },
+  ]),
 );
 
 export default eslintConfig;
