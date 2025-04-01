@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
 jobs:
-  ci:
+  ci-cd:
     permissions:
       security-events: write
       contents: write
