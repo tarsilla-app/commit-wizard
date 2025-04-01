@@ -8,11 +8,10 @@ jobs:
       security-events: write
       contents: write
       id-token: write
-    uses: ./.github/workflows/node.yml
+    uses: tarsilla-app/workflows/node.yml@main
     with:
       suppression: true
       publish: npm
-      local-actions: true
     secrets: 
       snyk-token: ${{ secrets.SNYK_TOKEN }}
       npm-token: ${{ secrets.NPM_TOKEN }}
