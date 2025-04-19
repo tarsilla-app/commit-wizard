@@ -52,6 +52,10 @@ type PluginConfig = { tap?: string };
 let verified = false;
 
 async function createTag(_pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN is not set in the environment.');
+  }
+
   const { nextRelease, logger, options } = context;
 
   const tagName = `v${nextRelease.version}`;
@@ -66,16 +70,21 @@ async function createTag(_pluginConfig: PluginConfig, context: PrepareContext): 
   });
 
   try {
+    const branchName = options.branch ?? 'main';
+    logger.log(`Branch name: ${branchName}`);
+
     // Get the latest commit SHA from the default branch
     const { data: branch } = await octokit.repos.getBranch({
       owner,
       repo,
-      branch: options.branch ?? 'main',
+      branch: branchName,
     });
 
     const commitSha = branch.commit.sha;
+    logger.log(`Latest commit SHA: ${commitSha}`);
 
     // Create the tag object
+    logger.log(`Creating tag object for ${tagName}...`);
     await octokit.git.createTag({
       owner,
       repo,
@@ -86,6 +95,7 @@ async function createTag(_pluginConfig: PluginConfig, context: PrepareContext): 
     });
 
     // Create the reference for the tag
+    logger.log(`Creating reference for tag ${tagName}...`);
     await octokit.git.createRef({
       owner,
       repo,
