@@ -59,6 +59,7 @@
     "semantic-release": "^24"
   },
   "dependencies": {
+    "@octokit/rest": "^21.1.1",
     "chokidar": "^4.0.3",
     "inquirer": "^8.2.6"
   },

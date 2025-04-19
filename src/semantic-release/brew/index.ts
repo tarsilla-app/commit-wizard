@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 
+import { Octokit } from '@octokit/rest';
 //@ts-ignore
 import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
 import {
@@ -49,6 +50,55 @@ const analyzerConfig = {
 type PluginConfig = { tap?: string };
 
 let verified = false;
+
+async function createTag(_pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
+  const { nextRelease, logger, options } = context;
+
+  const tagName = `v${nextRelease.version}`;
+
+  const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
+  const [owner, repo] = new URL(repositoryUrl).pathname.slice(1).split('/');
+
+  logger.log(`Creating tag ${tagName} using GitHub API...`);
+
+  const octokit = new Octokit({
+    auth: process.env.GITHUB_TOKEN, // Ensure GITHUB_TOKEN is available in the environment
+  });
+
+  try {
+    // Get the latest commit SHA from the default branch
+    const { data: branch } = await octokit.repos.getBranch({
+      owner,
+      repo,
+      branch: options.branch ?? 'main',
+    });
+
+    const commitSha = branch.commit.sha;
+
+    // Create the tag object
+    await octokit.git.createTag({
+      owner,
+      repo,
+      tag: tagName,
+      message: `Release ${tagName}`,
+      object: commitSha,
+      type: 'commit',
+    });
+
+    // Create the reference for the tag
+    await octokit.git.createRef({
+      owner,
+      repo,
+      ref: `refs/tags/${tagName}`,
+      sha: commitSha,
+    });
+
+    logger.log(`Tag ${tagName} created successfully.`);
+  } catch (error) {
+    logger.error(`Failed to create tag ${tagName}: ${(error as Error).message}`);
+    throw error;
+  }
+}
 
 async function calculateSha256(url: string, context: PrepareContext): Promise<string> {
   const { logger } = context;
@@ -104,14 +154,14 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
     throw new Error('Next release version is not available.');
   }
 
-  const version = nextRelease.version;
+  const tagName = `v${nextRelease.version}`;
 
   const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
   const url = new URL(repositoryUrl);
   const repositoryPath = url.pathname;
   const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
 
-  const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/v${version}`;
+  const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/${tagName}`;
   const sha256 = await calculateSha256(tarUrl, context);
   const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
 
@@ -120,7 +170,7 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
   formulaContent = formulaContent.replace(/sha256 ".*"/, `sha256 "${sha256}"`);
   fs.writeFileSync(formulaFile, formulaContent);
 
-  logger.log(`Updated formula with version ${version}, URL ${tarUrl}, and SHA256 ${sha256}`);
+  logger.log(`Updated formula with version ${tagName}, URL ${tarUrl}, and SHA256 ${sha256}`);
 }
 
 async function addChannel(_pluginConfig: PluginConfig, _context: AddChannelContext): Promise<void> {
@@ -159,6 +209,8 @@ async function prepare(pluginConfig: PluginConfig, context: PrepareContext): Pro
     const { options } = context;
     const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
     const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
+
+    await createTag(pluginConfig, context);
 
     await updateFormulaFile(pluginConfig, context);
 
