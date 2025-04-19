@@ -10,14 +10,12 @@ jobs:
       id-token: write
     uses: tarsilla-app/workflows/.github/workflows/node.yml@main
     with:
-      #code-analysis: |
-      #  {
-      #    "snyk": ["test", "code-test"],
-      #    "owasp": {
-      #      "suppression": true
-      #    },
-      #    "codeql": true
-      #  }
+      code-analysis: |
+        {
+          "snyk": false,
+          "owasp": false,
+          "codeql": false
+        }
       publish: |
         {
           "npm": true
