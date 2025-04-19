@@ -89,5 +89,3 @@ Contributions are welcome! Please ensure your pull request adheres to the projec
 ## License
 
 Released under the [MIT License](LICENSE).
-
-trigger cicd
