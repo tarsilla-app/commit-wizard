@@ -10,20 +10,16 @@ jobs:
       id-token: write
     uses: tarsilla-app/workflows/.github/workflows/node.yml@main
     with:
-      code-analysis: >
-        {{
-          toJSON({
-            snyk: ["test", "code-test"],
-            owasp: true,
-            codeql: true
-          })
-        }}
-      publish: >
-        {{
-          toJSON({
-            npm: true
-          })
-        }}
+      code-analysis: |
+        {
+          "snyk": ["test", "code-test"],
+          "owasp": true,
+          "codeql": true
+        }
+      publish: |
+        {
+          "npm": true
+        }
     secrets: 
       snyk-token: ${{ secrets.SNYK_TOKEN }}
       npm-token: ${{ secrets.NPM_TOKEN }}
