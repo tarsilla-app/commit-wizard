@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import fs from 'fs';
-import https from 'https';
 
 //@ts-ignore
 import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
@@ -52,18 +51,36 @@ type PluginConfig = { tap?: string };
 let verified = false;
 
 async function calculateSha256(url: string): Promise<string> {
-  return new Promise((resolve, _reject) => {
-    https
-      .get(url, (res) => {
-        const hash = crypto.createHash('sha256');
-        res.on('data', (chunk) => hash.update(chunk));
-        res.on('end', () => {
-          resolve(hash.digest('hex'));
-        });
-      })
-      .on('error', (err) => {
-        throw new Error('Error fetching the file:', { cause: err.message });
-      });
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch file. Status Code: ${response.status}`);
+  }
+
+  if (!response.body) {
+    throw new Error('Response body is null.');
+  }
+
+  const hash = crypto.createHash('sha256');
+  const reader = response.body.getReader();
+
+  return new Promise((resolve, reject) => {
+    function read() {
+      reader
+        .read()
+        .then(({ done, value }) => {
+          if (done) {
+            resolve(hash.digest('hex'));
+            return;
+          }
+          if (value) {
+            hash.update(value);
+          }
+          read();
+        })
+        .catch(reject);
+    }
+    read();
   });
 }
 
@@ -91,7 +108,7 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
   const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
 
   const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/v${version}`;
-  const sha256 = await calculateSha256(tarUrl); //execSync(`curl -L ${tarUrl} | sha256sum | awk '{print $1}'`).toString().trim();
+  const sha256 = await calculateSha256(tarUrl);
   const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
 
   let formulaContent = fs.readFileSync(formulaFile, 'utf8');
