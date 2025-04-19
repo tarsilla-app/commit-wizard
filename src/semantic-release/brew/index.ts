@@ -50,7 +50,11 @@ type PluginConfig = { tap?: string };
 
 let verified = false;
 
-async function calculateSha256(url: string): Promise<string> {
+async function calculateSha256(url: string, context: PrepareContext): Promise<string> {
+  const { logger } = context;
+
+  logger.log(`Calculating SHA256 for URL: ${url}`);
+
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -108,7 +112,7 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
   const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
 
   const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/v${version}`;
-  const sha256 = await calculateSha256(tarUrl);
+  const sha256 = await calculateSha256(tarUrl, context);
   const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
 
   let formulaContent = fs.readFileSync(formulaFile, 'utf8');
