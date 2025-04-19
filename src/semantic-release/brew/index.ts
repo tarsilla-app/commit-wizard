@@ -1,5 +1,6 @@
-import { execSync } from 'child_process';
+import crypto from 'crypto';
 import fs from 'fs';
+import https from 'https';
 
 //@ts-ignore
 import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
@@ -50,6 +51,22 @@ type PluginConfig = { tap?: string };
 
 let verified = false;
 
+async function calculateSha256(url: string): Promise<string> {
+  return new Promise((resolve, _reject) => {
+    https
+      .get(url, (res) => {
+        const hash = crypto.createHash('sha256');
+        res.on('data', (chunk) => hash.update(chunk));
+        res.on('end', () => {
+          resolve(hash.digest('hex'));
+        });
+      })
+      .on('error', (err) => {
+        throw new Error('Error fetching the file:', { cause: err.message });
+      });
+  });
+}
+
 function getFormulaFile(pluginConfig: PluginConfig, repositoryUrl: string): string {
   const url = new URL(repositoryUrl);
   const repositoryPath = url.pathname;
@@ -74,7 +91,7 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
   const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
 
   const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/v${version}`;
-  const sha256 = execSync(`curl -L ${tarUrl} | sha256sum | awk '{print $1}'`).toString().trim();
+  const sha256 = await calculateSha256(tarUrl); //execSync(`curl -L ${tarUrl} | sha256sum | awk '{print $1}'`).toString().trim();
   const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
 
   let formulaContent = fs.readFileSync(formulaFile, 'utf8');
