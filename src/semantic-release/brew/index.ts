@@ -69,8 +69,11 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
   const version = nextRelease.version;
 
   const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
+  const url = new URL(repositoryUrl);
+  const repositoryPath = url.pathname;
+  const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
 
-  const tarUrl = `${repositoryUrl}/archive/refs/tags/v${version}.tar.gz`;
+  const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/v${version}`;
   const sha256 = execSync(`curl -L ${tarUrl} | sha256sum | awk '{print $1}'`).toString().trim();
   const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
 
