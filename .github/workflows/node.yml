@@ -13,7 +13,9 @@ jobs:
       code-analysis: |
         {
           "snyk": ["test", "code-test"],
-          "owasp": true,
+          "owasp": {
+            "suppression": true,
+          },
           "codeql": true
         }
       publish: |
