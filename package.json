@@ -18,10 +18,15 @@
       "import": "./lib/commitlint/index.mjs",
       "default": "./lib/commitlint/index.mjs"
     },
-    "./semantic-release": {
-      "require": "./lib/semantic-release/index.mjs",
-      "import": "./lib/semantic-release/index.mjs",
-      "default": "./lib/semantic-release/index.mjs"
+    "./semantic-release/brew": {
+      "require": "./lib/semantic-release/brew/index.mjs",
+      "import": "./lib/semantic-release/brew/index.mjs",
+      "default": "./lib/semantic-release/brew/index.mjs"
+    },
+    "./semantic-release/node": {
+      "require": "./lib/semantic-release/node/index.mjs",
+      "import": "./lib/semantic-release/node/index.mjs",
+      "default": "./lib/semantic-release/node/index.mjs"
     },
     "./package.json": "./package.json"
   },

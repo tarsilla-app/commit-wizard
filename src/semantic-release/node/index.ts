@@ -14,28 +14,8 @@ import {
 } from '@semantic-release/npm';
 //@ts-ignore
 import { generateNotes } from '@semantic-release/release-notes-generator';
-import {
-  AddChannelContext,
-  AnalyzeCommitsContext,
-  FailContext,
-  GenerateNotesContext,
-  PrepareContext,
-  PublishContext,
-  SuccessContext,
-  VerifyConditionsContext,
-} from 'semantic-release';
 
-// This interface describes the hooks exposed by a semantic-release plugin.
-export type SemanticReleasePlugin = {
-  addChannel?(pluginConfig: unknown, context: AddChannelContext): Promise<void>;
-  analyzeCommits?(pluginConfig: unknown, context: AnalyzeCommitsContext): Promise<string | false>;
-  fail?(pluginConfig: unknown, context: FailContext): Promise<void>;
-  generateNotes?(pluginConfig: unknown, context: GenerateNotesContext): Promise<string>;
-  prepare?(pluginConfig: unknown, context: PrepareContext): Promise<void>;
-  publish?(pluginConfig: unknown, context: PublishContext): Promise<unknown>;
-  success?(pluginConfig: unknown, context: SuccessContext): Promise<void>;
-  verifyConditions?(pluginConfig: unknown, context: VerifyConditionsContext): Promise<void>;
-};
+import { SemanticReleasePlugin } from '../types.js';
 
 const analyzerConfig = {
   preset: 'conventionalcommits',

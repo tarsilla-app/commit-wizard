@@ -37,5 +37,6 @@ function build({ folder = '' } = {}) {
 export default [
   ...build({ folder: 'commitizen' }),
   ...build({ folder: 'commitlint' }),
-  ...build({ folder: 'semantic-release' }),
+  ...build({ folder: 'semantic-release/brew' }),
+  ...build({ folder: 'semantic-release/node' }),
 ];
