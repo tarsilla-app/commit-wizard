@@ -70,7 +70,7 @@ async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareCon
 
   const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
 
-  const tarUrl = `${repositoryUrl}/archive/refs/tags/${version}.tar.gz`;
+  const tarUrl = `${repositoryUrl}/archive/refs/tags/v${version}.tar.gz`;
   const sha256 = execSync(`curl -L ${tarUrl} | sha256sum | awk '{print $1}'`).toString().trim();
   const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
 
