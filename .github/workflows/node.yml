@@ -12,9 +12,11 @@ jobs:
     with:
       code-analysis: |
         {
-          "snyk": false,
-          "owasp": false,
-          "codeql": false
+          "snyk": ["test", "code-test"],
+          "owasp": {
+            "suppression": true
+          },
+          "codeql": true
         }
       publish: |
         {
