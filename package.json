@@ -23,10 +23,10 @@
       "import": "./lib/semantic-release/brew/index.mjs",
       "default": "./lib/semantic-release/brew/index.mjs"
     },
-    "./semantic-release/node": {
-      "require": "./lib/semantic-release/node/index.mjs",
-      "import": "./lib/semantic-release/node/index.mjs",
-      "default": "./lib/semantic-release/node/index.mjs"
+    "./semantic-release/npm": {
+      "require": "./lib/semantic-release/npm/index.mjs",
+      "import": "./lib/semantic-release/npm/index.mjs",
+      "default": "./lib/semantic-release/npm/index.mjs"
     },
     "./package.json": "./package.json"
   },

@@ -38,5 +38,5 @@ export default [
   ...build({ folder: 'commitizen' }),
   ...build({ folder: 'commitlint' }),
   ...build({ folder: 'semantic-release/brew' }),
-  ...build({ folder: 'semantic-release/node' }),
+  ...build({ folder: 'semantic-release/npm' }),
 ];
