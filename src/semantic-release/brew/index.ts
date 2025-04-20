@@ -4,11 +4,6 @@ import fs from 'fs';
 import { Octokit } from '@octokit/rest';
 //@ts-ignore
 import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
-import {
-  prepare as gitPrepare,
-  verifyConditions as gitVerifyConditions,
-  //@ts-ignore
-} from '@semantic-release/git';
 //@ts-ignore
 import { generateNotes as notesGeneratorGenerateNotes } from '@semantic-release/release-notes-generator';
 import {
@@ -51,61 +46,101 @@ type PluginConfig = { tap?: string };
 
 let verified = false;
 
-async function createTag(_pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
+function getFormulaFile(pluginConfig: PluginConfig, repositoryUrl: string): string {
+  const url = new URL(repositoryUrl);
+  const repositoryPath = url.pathname;
+  const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
+  const project = repository.split('/').pop();
+
+  return pluginConfig.tap ?? `${project}.rb`;
+}
+
+async function commitFormulaFile(pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
   if (!process.env.GITHUB_TOKEN) {
     throw new Error('GITHUB_TOKEN is not set in the environment.');
   }
 
   const { nextRelease, logger, options } = context;
 
-  const tagName = `v${nextRelease.version}`;
-
   const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
   const [owner, repo] = new URL(repositoryUrl).pathname.slice(1).split('/');
 
-  logger.log(`Creating tag ${tagName} using GitHub API...`);
+  const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
+  const branchName = options.branch ?? 'main';
+
+  logger.log(`Committing updated formula file ${formulaFile} to branch ${branchName}...`);
 
   const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN, // Ensure GITHUB_TOKEN is available in the environment
+    auth: process.env.GITHUB_TOKEN,
   });
 
   try {
-    const branchName = options.branch ?? 'main';
-    logger.log(`Branch name: ${branchName}`);
-
-    // Get the latest commit SHA from the default branch
+    // Get the latest commit SHA and tree SHA from the branch
     const { data: branch } = await octokit.repos.getBranch({
       owner,
       repo,
       branch: branchName,
     });
 
-    const commitSha = branch.commit.sha;
-    logger.log(`Latest commit SHA: ${commitSha}`);
+    const latestCommitSha = branch.commit.sha;
+    const baseTreeSha = branch.commit.commit.tree.sha;
 
-    // Create the tag object
-    logger.log(`Creating tag object for ${tagName}...`);
-    await octokit.git.createTag({
+    logger.log(`Latest commit SHA: ${latestCommitSha}`);
+    logger.log(`Base tree SHA: ${baseTreeSha}`);
+
+    // Read the updated formula file content
+    const formulaContent = fs.readFileSync(formulaFile, 'utf8');
+
+    // Create a new blob for the updated formula file
+    const { data: blob } = await octokit.git.createBlob({
       owner,
       repo,
-      tag: tagName,
-      message: `Release ${tagName}`,
-      object: commitSha,
-      type: 'commit',
+      content: formulaContent,
+      encoding: 'utf-8',
     });
 
-    // Create the reference for the tag
-    logger.log(`Creating reference for tag ${tagName}...`);
-    await octokit.git.createRef({
+    logger.log(`Created blob for ${formulaFile} with SHA: ${blob.sha}`);
+
+    // Create a new tree with the updated formula file
+    const { data: newTree } = await octokit.git.createTree({
       owner,
       repo,
-      ref: `refs/tags/${tagName}`,
-      sha: commitSha,
+      base_tree: baseTreeSha,
+      tree: [
+        {
+          path: formulaFile,
+          mode: '100644',
+          type: 'blob',
+          sha: blob.sha,
+        },
+      ],
     });
 
-    logger.log(`Tag ${tagName} created successfully.`);
+    logger.log(`Created new tree with SHA: ${newTree.sha}`);
+
+    // Create a new commit with the updated tree
+    const commitMessage = `chore(release): ${nextRelease.version}`;
+    const { data: newCommit } = await octokit.git.createCommit({
+      owner,
+      repo,
+      message: commitMessage,
+      tree: newTree.sha,
+      parents: [latestCommitSha],
+    });
+
+    logger.log(`Created new commit with SHA: ${newCommit.sha}`);
+
+    // Update the branch reference to point to the new commit
+    await octokit.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${branchName}`,
+      sha: newCommit.sha,
+    });
+
+    logger.log(`Branch ${branchName} updated to commit ${newCommit.sha}`);
   } catch (error) {
-    logger.error(`Failed to create tag ${tagName}: ${(error as Error).message}`);
+    logger.error(`Failed to commit formula file: ${(error as Error).message}`);
     throw error;
   }
 }
@@ -146,15 +181,6 @@ async function calculateSha256(url: string, context: PrepareContext): Promise<st
     }
     read();
   });
-}
-
-function getFormulaFile(pluginConfig: PluginConfig, repositoryUrl: string): string {
-  const url = new URL(repositoryUrl);
-  const repositoryPath = url.pathname;
-  const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
-  const project = repository.split('/').pop();
-
-  return pluginConfig.tap ?? `${project}.rb`;
 }
 
 async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
@@ -209,33 +235,20 @@ async function generateNotes(pluginConfig: PluginConfig, context: GenerateNotesC
   return notesGeneratorGenerateNotes({}, context);
 }
 
-async function prepare(pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
+async function prepare(_pluginConfig: PluginConfig, _context: PrepareContext): Promise<void> {
+  //do nothing
+}
+
+async function publish(pluginConfig: PluginConfig, context: PublishContext): Promise<unknown> {
   if (!verified) {
     await verifyConditions(pluginConfig, context);
     verified = true;
   }
 
-  if (gitPrepare) {
-    const { options } = context;
-    const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
-    const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
+  await updateFormulaFile(pluginConfig, context);
 
-    await createTag(pluginConfig, context);
+  await commitFormulaFile(pluginConfig, context);
 
-    await updateFormulaFile(pluginConfig, context);
-
-    await gitPrepare(
-      {
-        assets: [formulaFile],
-        message: 'chore(release): ${nextRelease.version}',
-      },
-      context,
-    );
-  }
-}
-
-async function publish(_pluginConfig: PluginConfig, _context: PublishContext): Promise<unknown> {
-  //do nothing
   return null;
 }
 
@@ -243,19 +256,7 @@ async function success(_pluginConfig: PluginConfig, _context: SuccessContext): P
   //do nothing
 }
 
-async function verifyConditions(pluginConfig: PluginConfig, context: VerifyConditionsContext): Promise<void> {
-  if (gitVerifyConditions) {
-    const { options } = context;
-    const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
-    const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
-    await gitVerifyConditions(
-      {
-        assets: [formulaFile],
-        message: 'chore(release): ${nextRelease.version}',
-      },
-      context,
-    );
-  }
+async function verifyConditions(_pluginConfig: PluginConfig, _context: VerifyConditionsContext): Promise<void> {
   verified = true;
 }
 
