@@ -1,9 +1,22 @@
+import { execSync } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs';
 
-import { Octokit } from '@octokit/rest';
 //@ts-ignore
 import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
+import {
+  prepare as gitPrepare,
+  verifyConditions as gitVerifyConditions,
+  //@ts-ignore
+} from '@semantic-release/git';
+import {
+  addChannel as gitHubAddChanel,
+  fail as gitHubFail,
+  publish as gitHubPublish,
+  success as gitHubSuccess,
+  verifyConditions as gitHubVerifyConditions,
+  //@ts-ignore
+} from '@semantic-release/github';
 //@ts-ignore
 import { generateNotes as notesGeneratorGenerateNotes } from '@semantic-release/release-notes-generator';
 import {
@@ -18,6 +31,8 @@ import {
 } from 'semantic-release';
 
 import { SemanticReleasePlugin } from '../types.js';
+
+const tarballFile = 'nextTag-stable.tar.gz';
 
 const analyzerConfig = {
   preset: 'conventionalcommits',
@@ -46,7 +61,9 @@ type PluginConfig = { tap?: string };
 
 let verified = false;
 
-function getFormulaFile(pluginConfig: PluginConfig, repositoryUrl: string): string {
+function getFormulaFile(pluginConfig: PluginConfig, context: PrepareContext): string {
+  const { options } = context;
+  const repositoryUrl = options.repositoryUrl!;
   const url = new URL(repositoryUrl);
   const repositoryPath = url.pathname;
   const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
@@ -55,162 +72,60 @@ function getFormulaFile(pluginConfig: PluginConfig, repositoryUrl: string): stri
   return pluginConfig.tap ?? `${project}.rb`;
 }
 
-async function commitFormulaFile(pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
-  if (!process.env.GITHUB_TOKEN) {
-    throw new Error('GITHUB_TOKEN is not set in the environment.');
-  }
+function generateTarball(_pluginConfig: PluginConfig, context: PrepareContext) {
+  const { nextRelease } = context;
 
-  const { nextRelease, logger, options } = context;
+  const nextTag = `v${nextRelease.version}`;
+  const tarFilePath = tarballFile.replace('nextTag', nextTag);
 
-  const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
-  const [owner, repo] = new URL(repositoryUrl).pathname.slice(1).split('/');
-
-  const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
-  const branchName = options.branch ?? 'main';
-
-  logger.log(`Committing updated formula file ${formulaFile} to branch ${branchName}...`);
-
-  const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
-  });
-
-  try {
-    // Get the latest commit SHA and tree SHA from the branch
-    const { data: branch } = await octokit.repos.getBranch({
-      owner,
-      repo,
-      branch: branchName,
-    });
-
-    const latestCommitSha = branch.commit.sha;
-    const baseTreeSha = branch.commit.commit.tree.sha;
-
-    logger.log(`Latest commit SHA: ${latestCommitSha}`);
-    logger.log(`Base tree SHA: ${baseTreeSha}`);
-
-    // Read the updated formula file content
-    const formulaContent = fs.readFileSync(formulaFile, 'utf8');
-
-    // Create a new blob for the updated formula file
-    const { data: blob } = await octokit.git.createBlob({
-      owner,
-      repo,
-      content: formulaContent,
-      encoding: 'utf-8',
-    });
-
-    logger.log(`Created blob for ${formulaFile} with SHA: ${blob.sha}`);
-
-    // Create a new tree with the updated formula file
-    const { data: newTree } = await octokit.git.createTree({
-      owner,
-      repo,
-      base_tree: baseTreeSha,
-      tree: [
-        {
-          path: formulaFile,
-          mode: '100644',
-          type: 'blob',
-          sha: blob.sha,
-        },
-      ],
-    });
-
-    logger.log(`Created new tree with SHA: ${newTree.sha}`);
-
-    // Create a new commit with the updated tree
-    const commitMessage = `chore(release): ${nextRelease.version}`;
-    const { data: newCommit } = await octokit.git.createCommit({
-      owner,
-      repo,
-      message: commitMessage,
-      tree: newTree.sha,
-      parents: [latestCommitSha],
-    });
-
-    logger.log(`Created new commit with SHA: ${newCommit.sha}`);
-
-    // Update the branch reference to point to the new commit
-    await octokit.git.updateRef({
-      owner,
-      repo,
-      ref: `heads/${branchName}`,
-      sha: newCommit.sha,
-    });
-
-    logger.log(`Branch ${branchName} updated to commit ${newCommit.sha}`);
-  } catch (error) {
-    logger.error(`Failed to commit formula file: ${(error as Error).message}`);
-    throw error;
-  }
+  execSync(`git archive --format=tar.gz --output=${tarFilePath} HEAD`);
 }
 
-async function calculateSha256(url: string, context: PrepareContext): Promise<string> {
-  const { logger } = context;
+function calculateSha256(_pluginConfig: PluginConfig, context: PrepareContext) {
+  const { nextRelease } = context;
 
-  logger.log(`Calculating SHA256 for URL: ${url}`);
+  const nextTag = `v${nextRelease.version}`;
+  const tarFilePath = tarballFile.replace('nextTag', nextTag);
 
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch file. Status Code: ${response.status}`);
-  }
-
-  if (!response.body) {
-    throw new Error('Response body is null.');
-  }
-
+  const fileBuffer = fs.readFileSync(tarFilePath);
   const hash = crypto.createHash('sha256');
-  const reader = response.body.getReader();
+  hash.update(fileBuffer);
 
-  return new Promise((resolve, reject) => {
-    function read() {
-      reader
-        .read()
-        .then(({ done, value }) => {
-          if (done) {
-            resolve(hash.digest('hex'));
-            return;
-          }
-          if (value) {
-            hash.update(value);
-          }
-          read();
-        })
-        .catch(reject);
-    }
-    read();
-  });
+  return hash.digest('hex');
 }
 
 async function updateFormulaFile(pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
-  const { nextRelease, logger, options } = context;
+  const { nextRelease, options } = context;
 
-  if (!nextRelease?.version) {
-    throw new Error('Next release version is not available.');
-  }
+  const nextTag = `v${nextRelease.version}`;
 
-  const tagName = `v${nextRelease.version}`;
-
-  const repositoryUrl = options.repositoryUrl!; // Guaranteed to be defined by semantic-release
+  const repositoryUrl = options.repositoryUrl!;
   const url = new URL(repositoryUrl);
   const repositoryPath = url.pathname;
   const repository = repositoryPath.startsWith('/') ? repositoryPath.slice(1) : repositoryPath;
+  const tarFilePath = tarballFile.replace('nextTag', nextTag);
 
-  const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/${tagName}`;
-  const sha256 = await calculateSha256(tarUrl, context);
-  const formulaFile = getFormulaFile(pluginConfig, repositoryUrl);
+  const tarUrl = `https://github.com/${repository}/releases/download/${nextTag}/${tarFilePath}`;
+  //const tarUrl = `https://codeload.github.com/${repository}/tar.gz/refs/tags/${tarFilePath}`;
+
+  const sha256 = calculateSha256(pluginConfig, context);
+  const formulaFile = getFormulaFile(pluginConfig, context);
 
   let formulaContent = fs.readFileSync(formulaFile, 'utf8');
   formulaContent = formulaContent.replace(/url ".*"/, `url "${tarUrl}"`);
   formulaContent = formulaContent.replace(/sha256 ".*"/, `sha256 "${sha256}"`);
   fs.writeFileSync(formulaFile, formulaContent);
-
-  logger.log(`Updated formula with version ${tagName}, URL ${tarUrl}, and SHA256 ${sha256}`);
 }
 
-async function addChannel(_pluginConfig: PluginConfig, _context: AddChannelContext): Promise<void> {
-  //do nothing
+async function addChannel(pluginConfig: PluginConfig, context: AddChannelContext): Promise<void> {
+  if (!verified) {
+    await verifyConditions(pluginConfig, context);
+    verified = true;
+  }
+
+  if (gitHubAddChanel) {
+    await gitHubAddChanel(pluginConfig, context);
+  }
 }
 
 async function analyzeCommits(pluginConfig: PluginConfig, context: AnalyzeCommitsContext): Promise<string | false> {
@@ -222,8 +137,10 @@ async function analyzeCommits(pluginConfig: PluginConfig, context: AnalyzeCommit
   return commitAnalyzerAnalyzeCommits(analyzerConfig, context);
 }
 
-async function fail(_pluginConfig: PluginConfig, _context: FailContext): Promise<void> {
-  //do nothing
+async function fail(pluginConfig: PluginConfig, context: FailContext): Promise<void> {
+  if (gitHubFail) {
+    await gitPrepare(pluginConfig, context);
+  }
 }
 
 async function generateNotes(pluginConfig: PluginConfig, context: GenerateNotesContext): Promise<string> {
@@ -235,8 +152,32 @@ async function generateNotes(pluginConfig: PluginConfig, context: GenerateNotesC
   return notesGeneratorGenerateNotes({}, context);
 }
 
-async function prepare(_pluginConfig: PluginConfig, _context: PrepareContext): Promise<void> {
-  //do nothing
+async function prepare(pluginConfig: PluginConfig, context: PrepareContext): Promise<void> {
+  if (!verified) {
+    await verifyConditions(pluginConfig, context);
+    verified = true;
+  }
+
+  if (gitPrepare) {
+    const { nextRelease } = context;
+    if (!nextRelease?.version) {
+      throw new Error('Next release version is not available.');
+    }
+
+    const formulaFile = getFormulaFile(pluginConfig, context);
+
+    generateTarball(pluginConfig, context);
+
+    await updateFormulaFile(pluginConfig, context);
+
+    await gitPrepare(
+      {
+        assets: [formulaFile],
+        message: 'chore(release): ${nextRelease.version}',
+      },
+      context,
+    );
+  }
 }
 
 async function publish(pluginConfig: PluginConfig, context: PublishContext): Promise<unknown> {
@@ -245,18 +186,47 @@ async function publish(pluginConfig: PluginConfig, context: PublishContext): Pro
     verified = true;
   }
 
-  await updateFormulaFile(pluginConfig, context);
+  if (gitHubPublish) {
+    const { nextRelease } = context;
+    const nextTag = `v${nextRelease.version}`;
+    const tarFilePath = tarballFile.replace('nextTag', nextTag);
 
-  await commitFormulaFile(pluginConfig, context);
+    const customPluginConfig = {
+      ...pluginConfig,
+      assets: [
+        {
+          path: tarFilePath,
+          label: `Homebrew Tarball (${nextTag})`,
+        },
+      ],
+    };
+    await gitHubPublish(customPluginConfig, context);
+  }
+  //await updateFormulaFile(pluginConfig, context);
+
+  //await commitFormulaFile(pluginConfig, context);
 
   return null;
 }
 
-async function success(_pluginConfig: PluginConfig, _context: SuccessContext): Promise<void> {
-  //do nothing
+async function success(pluginConfig: PluginConfig, context: SuccessContext): Promise<void> {
+  if (!verified) {
+    await verifyConditions(pluginConfig, context);
+    verified = true;
+  }
+
+  if (gitHubSuccess) {
+    await gitHubSuccess(pluginConfig, context);
+  }
 }
 
-async function verifyConditions(_pluginConfig: PluginConfig, _context: VerifyConditionsContext): Promise<void> {
+async function verifyConditions(pluginConfig: PluginConfig, context: VerifyConditionsContext): Promise<void> {
+  if (gitHubVerifyConditions) {
+    await gitHubVerifyConditions(pluginConfig, context);
+  }
+  if (gitVerifyConditions) {
+    await gitVerifyConditions(pluginConfig, context);
+  }
   verified = true;
 }
 
