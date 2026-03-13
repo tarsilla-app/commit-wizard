@@ -7,8 +7,8 @@ function userConfig({ maxLineLength }: CommitWizardOptions): UserConfig {
     extends: ['@commitlint/config-conventional'],
     parserPreset: {
       parserOpts: {
-        headerPattern: /^(?<type>\w+)(?<exclamation1>!?)(?:\((?<scope>[^)]+)\)(?<exclamation2>!?))?: (?<subject>.+)$/,
         headerCorrespondence: ['type', 'exclamation1', 'scope', 'exclamation2', 'subject'],
+        headerPattern: /^(?<type>\w+)(?<exclamation1>!?)(?:\((?<scope>[^)]+)\)(?<exclamation2>!?))?: (?<subject>.+)$/,
       },
     },
     rules: {

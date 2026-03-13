@@ -15,8 +15,14 @@ function configLoader(): CommitWizardOptions {
     return config;
   }
 
-  const loadedConfig = require(configPath);
-  return { ...config, ...loadedConfig };
+  const rawConfig = fs.readFileSync(configPath, 'utf8');
+  const parsedConfig: unknown = JSON.parse(rawConfig);
+
+  if (!parsedConfig || typeof parsedConfig !== 'object') {
+    return config;
+  }
+
+  return { ...config, ...parsedConfig };
 }
 
 export default configLoader;

@@ -1,149 +1,198 @@
 import js from '@eslint/js';
-import imports from 'eslint-plugin-import';
+import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
-import { config, configs } from 'typescript-eslint';
+import { configs } from 'typescript-eslint';
 
-const eslintConfig = config(
-  //ignores
-  ...config({
-    ignores: ['**/.vscode/', '**/node_modules/', '**/lib/'],
-  }),
-  //all
-  ...config([
-    js.configs.recommended,
-    ...configs.stylistic,
-    ...configs.stylisticTypeChecked,
+const perfectionistOverrides = {
+  'sort-exports': [
+    'error',
     {
-      languageOptions: {
-        parserOptions: {
-          ecmaVersion: 'latest',
-          sourceType: 'module',
-          project: true,
-          tsconfigRootDir: './',
+      order: 'asc',
+      type: 'alphabetical',
+    },
+  ],
+  'sort-imports': [
+    'error',
+    {
+      customGroups: [
+        {
+          elementNamePattern: '@tarsilla(/.*)?$',
+          groupName: '@tarsilla',
         },
-        globals: {
-          ...globals.builtin,
-          ...globals.es2021,
-          ...globals.node,
-        },
+      ],
+      groups: [
+        'type-import',
+        'value-builtin',
+        'value-external',
+        '@tarsilla',
+        'value-internal',
+        ['type-parent', 'type-sibling', 'type-index'],
+        ['value-parent', 'value-sibling', 'value-index'],
+        'ts-equals-import',
+        'unknown',
+      ],
+      ignoreCase: false,
+      newlinesBetween: 1,
+      order: 'asc',
+      tsconfig: {
+        rootDir: '.',
       },
-      rules: {
-        '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-        '@typescript-eslint/explicit-module-boundary-types': 'error',
-        '@typescript-eslint/no-explicit-any': 'error',
+      type: 'alphabetical',
+    },
+  ],
+  'sort-named-exports': [
+    'error',
+    {
+      order: 'asc',
+      type: 'alphabetical',
+    },
+  ],
+  'sort-named-imports': [
+    'error',
+    {
+      order: 'asc',
+      type: 'alphabetical',
+    },
+  ],
+  'sort-union-types': [
+    'error',
+    {
+      groups: [
+        'conditional',
+        'function',
+        'import',
+        'intersection',
+        'keyword',
+        'literal',
+        'named',
+        'object',
+        'operator',
+        'tuple',
+        'union',
+        'nullish',
+      ],
+      ignoreCase: false,
+      order: 'asc',
+      type: 'alphabetical',
+    },
+  ],
+};
+
+function getRules(options) {
+  return Object.fromEntries(
+    Object.keys(perfectionist.rules).map((rule) => {
+      const override = perfectionistOverrides[rule];
+      return [`perfectionist/${rule}`, override ?? ['error', options]];
+    }),
+  );
+}
+
+const eslintConfig = defineConfig(
+  {
+    ignores: ['**/.vscode/', '**/node_modules/', '**/lib/'],
+  },
+  js.configs.recommended,
+  ...configs.strictTypeChecked,
+  ...configs.stylisticTypeChecked,
+  {
+    plugins: {
+      perfectionist,
+    },
+    rules: {
+      ...getRules({
+        ignoreCase: true,
+        order: 'asc',
+        specialCharacters: 'trim',
+        type: 'alphabetical',
+      }),
+    },
+  },
+  {
+    languageOptions: {
+      globals: {
+        ...globals.builtin,
+        ...globals.es2021,
+        ...globals.node,
+      },
+      parserOptions: {
+        ecmaVersion: 'latest',
+        project: true,
+        sourceType: 'module',
+        tsconfigRootDir: import.meta.dirname,
       },
     },
-  ]),
-  //unused-imports
-  ...config({
+    rules: {
+      '@typescript-eslint/no-require-imports': [
+        'error',
+        {
+          allow: ['/commit-wizard.config\\.json$'],
+        },
+      ],
+      //'no-console': 'error',
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        {
+          allowNumber: true,
+        },
+      ],
+    },
+  },
+  {
     plugins: {
       'unused-imports': unusedImports,
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': 'off',
       'no-unused-vars': 'off',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'error',
         {
-          vars: 'all',
-          varsIgnorePattern: '^_',
           args: 'after-used',
           argsIgnorePattern: '^_',
+          vars: 'all',
+          varsIgnorePattern: '^_',
         },
       ],
     },
-  }),
-  //sort-imports
-  ...config({
+    settings: {
+      'import/resolver': {
+        node: true,
+        typescript: true,
+      },
+    },
+  },
+  {
+    extends: [configs.disableTypeChecked],
+    files: ['**/*.{cjs,mjs,js,jsx}'],
+  },
+  prettierRecommended,
+  {
     rules: {
-      'sort-imports': [
+      ...prettierRecommended.rules,
+      'prettier/prettier': [
         'error',
         {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-          ignoreMemberSort: false,
+          jsxSingleQuote: true,
+          printWidth: 120,
+          semi: true,
+          singleQuote: true,
+          tabWidth: 2,
+          trailingComma: 'all',
+        },
+        {
+          fileInfoOptions: {
+            withNodeModules: true,
+          },
+          usePrettierrc: false,
         },
       ],
     },
-  }),
-  //imports
-  ...config([
-    imports.flatConfigs.recommended,
-    imports.flatConfigs.typescript,
-    {
-      rules: {
-        'import/order': [
-          'error',
-          {
-            groups: ['builtin', 'external', 'internal', ['parent', 'sibling']],
-            pathGroups: [
-              {
-                pattern: 'react',
-                group: 'external',
-                position: 'before',
-              },
-              {
-                pattern: '@tarsilla/**',
-                group: 'internal',
-                position: 'before',
-              },
-            ],
-            pathGroupsExcludedImportTypes: ['react', '@tarsilla'],
-            'newlines-between': 'always',
-            alphabetize: {
-              order: 'asc',
-              caseInsensitive: true,
-            },
-          },
-        ],
-      },
-      settings: {
-        'import/resolver': {
-          typescript: true,
-          node: true,
-        },
-      },
-    },
-  ]),
-  //javascript
-  {
-    files: ['**/*.{cjs,mjs,js,jsx}'],
-    extends: [configs.disableTypeChecked],
   },
-  //javascript
-  ...config({
-    files: ['**/*.{cjs,mjs,js,jsx}'],
-    extends: [configs.disableTypeChecked],
-  }),
-  //prettier
-  ...config([
-    prettierRecommended,
-    {
-      rules: {
-        ...prettierRecommended.rules,
-        'prettier/prettier': [
-          'error',
-          {
-            semi: true,
-            trailingComma: 'all',
-            singleQuote: true,
-            jsxSingleQuote: true,
-            printWidth: 120,
-            tabWidth: 2,
-          },
-          {
-            usePrettierrc: false,
-            fileInfoOptions: {
-              withNodeModules: true,
-            },
-          },
-        ],
-      },
-    },
-  ]),
 );
 
 export default eslintConfig;

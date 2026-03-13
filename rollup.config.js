@@ -11,10 +11,10 @@ function build({ folder = '' } = {}) {
       input: `src/${_folder}index.ts`,
       output: [
         {
+          exports: 'auto',
           file: `lib/${_folder}index.mjs`,
           format: 'esm',
           sourcemap: true,
-          exports: 'auto',
         },
       ],
       plugins: [

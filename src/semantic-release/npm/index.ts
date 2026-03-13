@@ -1,49 +1,41 @@
-//@ts-ignore
 import { analyzeCommits } from '@semantic-release/commit-analyzer';
+import { prepare as gitPrepare, verifyConditions as gitVerifyConditions } from '@semantic-release/git';
 import {
-  prepare as gitPrepare,
-  verifyConditions as gitVerifyConditions,
-  //@ts-ignore
-} from '@semantic-release/git';
-import {
-  addChannel as npmAddChannel,
   prepare as npmPrepare,
   publish as npmPublish,
   verifyConditions as npmVerifyConditions,
-  //@ts-ignore
 } from '@semantic-release/npm';
-//@ts-ignore
 import { generateNotes } from '@semantic-release/release-notes-generator';
 
 import { SemanticReleasePlugin } from '../types.js';
 
 const analyzerConfig = {
-  preset: 'conventionalcommits',
   parserOpts: {
-    headerPattern: /^(?<type>\w+)(?<exclamation1>!?)(?:\((?<scope>[^)]+)\)(?<exclamation2>!?))?: (?<subject>.+)$/,
     headerCorrespondence: ['type', 'exclamation1', 'scope', 'exclamation2', 'subject'],
+    headerPattern: /^(?<type>\w+)(?<exclamation1>!?)(?:\((?<scope>[^)]+)\)(?<exclamation2>!?))?: (?<subject>.+)$/,
   },
+  preset: 'conventionalcommits',
   releaseRules: [
-    { type: 'feat', exclamation1: '!', release: 'major' },
-    { type: 'feat', exclamation2: '!', release: 'major' },
-    { type: 'feat', release: 'minor' },
-    { type: 'fix', release: 'patch' },
-    { type: 'docs', release: 'patch' },
-    { type: 'style', release: 'patch' },
-    { type: 'refactor', release: 'patch' },
-    { type: 'perf', release: 'patch' },
-    { type: 'test', release: 'patch' },
-    { type: 'build', release: 'patch' },
-    { type: 'ci', release: 'patch' },
-    { type: 'chore', release: 'patch' },
-    { type: 'revert', release: 'patch' },
+    { exclamation1: '!', release: 'major', type: 'feat' },
+    { exclamation2: '!', release: 'major', type: 'feat' },
+    { release: 'minor', type: 'feat' },
+    { release: 'patch', type: 'fix' },
+    { release: 'patch', type: 'docs' },
+    { release: 'patch', type: 'style' },
+    { release: 'patch', type: 'refactor' },
+    { release: 'patch', type: 'perf' },
+    { release: 'patch', type: 'test' },
+    { release: 'patch', type: 'build' },
+    { release: 'patch', type: 'ci' },
+    { release: 'patch', type: 'chore' },
+    { release: 'patch', type: 'revert' },
   ],
 };
 
 const npmConfig = {
-  tag: 'latest',
   npmPublish: true,
   optional: false,
+  tag: 'latest',
 };
 
 const gitConfig = {
@@ -52,22 +44,15 @@ const gitConfig = {
 };
 
 const plugin: SemanticReleasePlugin = {
-  addChannel: async (_pluginConfig, context) => {
-    if (npmAddChannel) {
-      await npmAddChannel(npmConfig, context);
-    }
+  addChannel: async (_pluginConfig, _context) => {
+    //await npmAddChannel(npmConfig, context);
   },
-  verifyConditions: async (_pluginConfig, context) => {
-    if (npmVerifyConditions) {
-      await npmVerifyConditions(npmConfig, context);
-    }
-    if (gitVerifyConditions) {
-      await gitVerifyConditions(gitConfig, context);
-    }
-  },
-
   analyzeCommits: async (_pluginConfig, context) => {
     return analyzeCommits(analyzerConfig, context);
+  },
+
+  fail: async (_pluginConfig, _context) => {
+    //await gitFail(gitConfig, context);
   },
 
   generateNotes: async (_pluginConfig, context) => {
@@ -75,33 +60,22 @@ const plugin: SemanticReleasePlugin = {
   },
 
   prepare: async (_pluginConfig, context) => {
-    if (npmPrepare) {
-      await npmPrepare(npmConfig, context);
-    }
-    if (gitPrepare) {
-      await gitPrepare(gitConfig, context);
-    }
+    await npmPrepare(npmConfig, context);
+    await gitPrepare(gitConfig, context);
   },
 
   publish: async (_pluginConfig, context) => {
-    if (npmPublish) {
-      await npmPublish(npmConfig, context);
-    }
-    /*if (gitPublish) {
-      await gitPublish(gitConfig, context);
-    }*/
+    await npmPublish(npmConfig, context);
+    //await gitPublish(gitConfig, context);
   },
 
   success: async (_pluginConfig, _context) => {
-    /*if (gitSuccess) {
-      await gitSuccess(gitConfig, context);
-    }*/
+    //await gitSuccess(gitConfig, context);
   },
 
-  fail: async (_pluginConfig, _context) => {
-    /*if (gitFail) {
-      await gitFail(gitConfig, context);
-    }*/
+  verifyConditions: async (_pluginConfig, context) => {
+    await npmVerifyConditions(npmConfig, context);
+    await gitVerifyConditions(gitConfig, context);
   },
 };
 

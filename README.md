@@ -70,8 +70,8 @@ It is recommended to configure CI/CD to run semantic-release, ex. using github a
 You can override default settings by creating a `commit-wizard.config.json` file in your project root.
 The plugin accepts an object of type `CommitWizardOptions`:
 
-| Option   | Type   | Description                                                  | Default     |
-|----------|--------|--------------------------------------------------------------|-------------|
+| Option        | Type   | Description                                                  | Default                                    |     |
+|---------------|--------|--------------------------------------------------------------|--------------------------------------------|-----|
 | maxLineLength | number | The maximum length of the commit message. If not provided, the plugin will run with the default settings. | 120 |
 
 Example `commit-wizard.config.json`:
