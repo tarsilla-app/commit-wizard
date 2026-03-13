@@ -5,6 +5,7 @@ A custom configuration library for [commitizen](https://github.com/commitizen/cz
 ## Features
 
 **@tarsilla/commit-wizard** provides a unified solution to enforce standardized commit messages and automate releases. It bundles tailored configurations for:
+
 - **Commitizen** – interactive commit prompt
 - **Commitlint** – commit message linting
 - **Semantic-release** – automated release management
@@ -62,7 +63,7 @@ module.exports = {
 };
 ```
 
-The semantic-release configuration automates version management and changelog generation. 
+The semantic-release configuration automates version management and changelog generation.
 It is recommended to configure CI/CD to run semantic-release, ex. using github actions (e.g. see [.github/workflows/npm-publish.yml](src/semantic-release/npm-publish.yml)).
 
 ## Configuration Options
@@ -70,9 +71,9 @@ It is recommended to configure CI/CD to run semantic-release, ex. using github a
 You can override default settings by creating a `commit-wizard.config.json` file in your project root.
 The plugin accepts an object of type `CommitWizardOptions`:
 
-| Option        | Type   | Description                                                  | Default                                    |     |
-|---------------|--------|--------------------------------------------------------------|--------------------------------------------|-----|
-| maxLineLength | number | The maximum length of the commit message. If not provided, the plugin will run with the default settings. | 120 |
+| Option        | Type   | Description                                                                                               | Default |
+|---------------|--------|-----------------------------------------------------------------------------------------------------------|---------|
+| maxLineLength | number | The maximum length of the commit message. If not provided, the plugin will run with the default settings. | 120     |
 
 Example `commit-wizard.config.json`:
 
