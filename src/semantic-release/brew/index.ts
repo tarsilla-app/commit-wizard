@@ -50,9 +50,9 @@ const analyzerConfig = {
   ],
 };
 
-interface PluginConfig {
+type PluginConfig = {
   tap?: string;
-}
+};
 
 let verified = false;
 

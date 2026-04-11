@@ -2,11 +2,22 @@ import js from '@eslint/js';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
-import { defineConfig } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import { configs } from 'typescript-eslint';
 
 const perfectionistOverrides = {
+  'sort-arrays': [
+    'error',
+    {
+      ignoreCase: false,
+      order: 'asc',
+      specialCharacters: 'trim',
+      useConfigurationIf: {
+        matchesAstSelector: 'TSAsExpression > ArrayExpression',
+      },
+    },
+  ],
   'sort-exports': [
     'error',
     {
@@ -91,9 +102,7 @@ function getRules(options) {
 }
 
 const eslintConfig = defineConfig(
-  {
-    ignores: ['**/.vscode/', '**/node_modules/', '**/lib/'],
-  },
+  globalIgnores(['**/.vscode/', '**/node_modules/', '**/lib/']),
   js.configs.recommended,
   ...configs.strictTypeChecked,
   ...configs.stylisticTypeChecked,
@@ -114,7 +123,7 @@ const eslintConfig = defineConfig(
     languageOptions: {
       globals: {
         ...globals.builtin,
-        ...globals.es2021,
+        ...globals.es2026,
         ...globals.node,
       },
       parserOptions: {
@@ -145,7 +154,9 @@ const eslintConfig = defineConfig(
       'unused-imports': unusedImports,
     },
     rules: {
+      'import/order': 'off',
       'no-unused-vars': 'off',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error',

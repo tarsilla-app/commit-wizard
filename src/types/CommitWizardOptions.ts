@@ -1,5 +1,5 @@
-interface CommitWizardOptions {
+type CommitWizardOptions = {
   maxLineLength: number;
-}
+};
 
 export default CommitWizardOptions;

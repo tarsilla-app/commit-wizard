@@ -31,8 +31,6 @@ module.exports = {
       '@semantic-release/npm',
       {
         npmPublish: true,
-        optional: false,
-        tag: 'latest',
       },
     ],
     [

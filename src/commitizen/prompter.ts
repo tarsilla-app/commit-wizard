@@ -2,12 +2,12 @@ import { Commitizen, Prompter } from 'commitizen';
 
 import CommitWizardOptions from '../types/CommitWizardOptions.js';
 
-export interface CommitAnswers {
+export type CommitAnswers = {
   confirmCommit: string;
   scope: string;
   subject: string;
   type: string;
-}
+};
 
 function getCommitMessage({ answers }: { answers: Partial<CommitAnswers> }) {
   const scopeText = answers.scope ? `(${answers.scope})` : '';

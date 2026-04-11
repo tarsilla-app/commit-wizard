@@ -54,7 +54,7 @@
     "semantic-release": "^25"
   },
   "dependencies": {
-    "@commitlint/config-conventional": "^20.4.4",
+    "@commitlint/config-conventional": "^20.5.0",
     "@octokit/rest": "^22.0.1",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
@@ -69,26 +69,26 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-swc": "^0.4.0",
     "@rollup/plugin-terser": "^1.0.0",
-    "@types/inquirer": "^8.2.12",
-    "eslint": "^10.0.3",
+    "@types/inquirer": "^9.0.9",
+    "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-perfectionist": "^5.6.0",
+    "eslint-plugin-perfectionist": "^5.8.0",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
-    "prettier": "^3.8.1",
-    "rollup": "^4.59.0",
-    "rollup-plugin-dts": "^6.4.0",
+    "prettier": "^3.8.2",
+    "rollup": "^4.60.1",
+    "rollup-plugin-dts": "^6.4.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.0"
+    "typescript-eslint": "^8.58.1"
   },
   "overrides": {
     "commitizen": {
       "inquirer": "^8.2.7",
-      "lodash": "^4.17.23"
+      "lodash": "^4.18.1"
     }
   }
 }

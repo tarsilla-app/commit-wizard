@@ -34,8 +34,6 @@ const analyzerConfig = {
 
 const npmConfig = {
   npmPublish: true,
-  optional: false,
-  tag: 'latest',
 };
 
 const gitConfig = {
