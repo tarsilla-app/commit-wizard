@@ -2,16 +2,6 @@ import { execSync } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs';
 
-import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
-import { prepare as gitPrepare, verifyConditions as gitVerifyConditions } from '@semantic-release/git';
-import {
-  addChannel as gitHubAddChanel,
-  fail as gitHubFail,
-  publish as gitHubPublish,
-  success as gitHubSuccess,
-  verifyConditions as gitHubVerifyConditions,
-} from '@semantic-release/github';
-import { generateNotes as notesGeneratorGenerateNotes } from '@semantic-release/release-notes-generator';
 import {
   AddChannelContext,
   AnalyzeCommitsContext,
@@ -22,6 +12,16 @@ import {
   SuccessContext,
   VerifyConditionsContext,
 } from 'semantic-release';
+import { analyzeCommits as commitAnalyzerAnalyzeCommits } from '@semantic-release/commit-analyzer';
+import { prepare as gitPrepare, verifyConditions as gitVerifyConditions } from '@semantic-release/git';
+import {
+  addChannel as gitHubAddChanel,
+  fail as gitHubFail,
+  publish as gitHubPublish,
+  success as gitHubSuccess,
+  verifyConditions as gitHubVerifyConditions,
+} from '@semantic-release/github';
+import { generateNotes as notesGeneratorGenerateNotes } from '@semantic-release/release-notes-generator';
 
 import { SemanticReleasePlugin } from '../types.js';
 

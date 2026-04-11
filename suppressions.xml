@@ -1,8 +1,14 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
+        <notes>False positive - not applicable to this project</notes>
         <cve>CVE-2021-23397</cve>
     </suppress>
     <suppress>
+        <notes>False positive - not applicable to this project</notes>
         <cve>CVE-2017-16115</cve>
+    </suppress>
+    <suppress until="2026-12-31Z">
+        <notes>Bundled inside npm@11 (via @semantic-release/npm), cannot be patched upstream</notes>
+        <cve>CVE-2026-33671</cve>
     </suppress>
 </suppressions>

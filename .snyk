@@ -1,0 +1,15 @@
+# .snyk
+version: v1.25.0
+ignore:
+  SNYK-JS-BRACEEXPANSION-15789759:
+    - '*':
+        reason: Bundled inside npm@11 (via @semantic-release/npm), cannot be patched upstream
+        expires: '2026-12-31T00:00:00.000Z'
+  SNYK-JS-PICOMATCH-15765513:
+    - '*':
+        reason: Bundled inside npm@11 (via @semantic-release/npm), cannot be patched upstream
+        expires: '2026-12-31T00:00:00.000Z'
+  SNYK-JS-PICOMATCH-15765511:
+    - '*':
+        reason: Bundled inside npm@11 (via @semantic-release/npm), cannot be patched upstream
+        expires: '2026-12-31T00:00:00.000Z'

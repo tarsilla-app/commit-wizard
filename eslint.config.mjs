@@ -1,8 +1,8 @@
-import js from '@eslint/js';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import js from '@eslint/js';
 import globals from 'globals';
 import { configs } from 'typescript-eslint';
 
@@ -21,7 +21,9 @@ const perfectionistOverrides = {
   'sort-exports': [
     'error',
     {
+      ignoreCase: false,
       order: 'asc',
+      specialCharacters: 'trim',
       type: 'alphabetical',
     },
   ],
@@ -48,6 +50,7 @@ const perfectionistOverrides = {
       ignoreCase: false,
       newlinesBetween: 1,
       order: 'asc',
+      specialCharacters: 'trim',
       tsconfig: {
         rootDir: '.',
       },
@@ -57,14 +60,18 @@ const perfectionistOverrides = {
   'sort-named-exports': [
     'error',
     {
+      ignoreCase: false,
       order: 'asc',
+      specialCharacters: 'trim',
       type: 'alphabetical',
     },
   ],
   'sort-named-imports': [
     'error',
     {
+      ignoreCase: false,
       order: 'asc',
+      specialCharacters: 'trim',
       type: 'alphabetical',
     },
   ],
@@ -87,6 +94,7 @@ const perfectionistOverrides = {
       ],
       ignoreCase: false,
       order: 'asc',
+      specialCharacters: 'trim',
       type: 'alphabetical',
     },
   ],
@@ -112,7 +120,7 @@ const eslintConfig = defineConfig(
     },
     rules: {
       ...getRules({
-        ignoreCase: true,
+        ignoreCase: false,
         order: 'asc',
         specialCharacters: 'trim',
         type: 'alphabetical',
